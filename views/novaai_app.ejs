@@ -44,16 +44,24 @@
   </div>
   <% } %>
 
-  <!-- Main 3-Pane Nova Shell (§3.1, §8) -->
+  <!-- Main Nova Shell: Switches between v2 and v3 (NOVA-UI-1) -->
   <div class="nova-shell">
-    <%- include('partials/nova/sidebar', { user: typeof user !== 'undefined' ? user : null, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
+    <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %>
+      <%- include('partials/nova/sidebar_v3', { user: typeof user !== 'undefined' ? user : null, isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+    <% } else { %>
+      <%- include('partials/nova/sidebar', { user: typeof user !== 'undefined' ? user : null, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
+    <% } %>
     <%- include('partials/nova/chat', { user: typeof user !== 'undefined' ? user : null, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
     <%- include('partials/nova/thread') %>
     <%- include('partials/nova/info_pane', { user: typeof user !== 'undefined' ? user : null, isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
   </div>
 
-  <!-- Top-Left Nova Popup Menu (triggered by clicking Nova's icon at top of screen) -->
-  <%- include('partials/nova/mobile_tabs', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+  <!-- Mobile Navigation / Sheets -->
+  <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %>
+    <%- include('partials/nova/mobile_tabs_v3', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+  <% } else { %>
+    <%- include('partials/nova/mobile_tabs', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+  <% } %>
 
   <!-- Command Palette Modal (Cmd/Ctrl+K) -->
   <%- include('partials/nova/palette') %>
