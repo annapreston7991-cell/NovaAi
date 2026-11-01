@@ -1,0 +1,105 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Nova Left Sidebar (§3.2, §10, §15.2) -->
+<nav id="novaSidebar" class="nova-sidebar" aria-label="Nova personas and conversations">
+  <!-- Top Header: Brand + Stop Nova Kill Switch -->
+  <div class="p-3.5 border-b border-white/10 flex items-center justify-between gap-2">
+    <button type="button" data-nova-action="toggle-nova-menu" class="flex items-center gap-2.5 group min-w-0 text-left focus:outline-none" title="Open Nova Menu">
+      <div class="w-8 h-8 rounded-xl overflow-hidden border border-cyan-500/40 group-hover:border-cyan-400 p-0.5 bg-black shrink-0 transition">
+        <img src="/images/nova-icon.jpg?v=20260925" alt="Nova" class="w-full h-full object-cover rounded-lg" />
+      </div>
+      <div class="min-w-0">
+        <div class="text-sm font-bold text-white tracking-tight truncate group-hover:text-cyan-300 transition">Nova Studio ▾</div>
+        <div class="text-[10px] font-mono text-cyan-400 truncate">LLYVerse OS</div>
+      </div>
+    </button>
+    <%- include('stop_button') %>
+  </div>
+
+  <!-- Search / Command Palette Trigger (Cmd/Ctrl+K) -->
+  <div class="px-3 pt-3 pb-2 flex items-center gap-2">
+    <button
+      type="button"
+      id="novaPaletteTrigger"
+      data-nova-action="open-palette"
+      class="flex-1 flex items-center justify-between px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-300 transition"
+      aria-label="Search chats, messages, and commands (Command K)"
+    >
+      <span class="flex items-center gap-2">
+        <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i>
+        <span>Jump or search...</span>
+      </span>
+      <kbd class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/50 text-slate-400 border border-white/10">⌘K</kbd>
+    </button>
+    <button
+      type="button"
+      id="novaNewChatBtn"
+      data-nova-action="new-chat"
+      class="p-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-cyan-300 transition"
+      title="New Conversation"
+      aria-label="Start new conversation"
+    >
+      <i data-lucide="plus" class="w-4 h-4"></i>
+    </button>
+  </div>
+
+  <!-- Scrollable Roster & Conversation Sections -->
+  <div class="flex-1 overflow-y-auto px-3 py-2 space-y-5">
+    <!-- Pinned Built-In Personas: Strictly Nova, Astra, Astaria (§2.7, Decisions 1 & 2) -->
+    <div>
+      <div class="px-2 pb-1.5 flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
+        <span>Personas</span>
+        <span id="novaTotalUnreadBadge" class="nova-unread-badge hidden" aria-live="polite">0 unread</span>
+      </div>
+      <div id="novaAgentList" class="space-y-1" role="listbox" aria-label="Built-in AI Personas">
+        <% const builtinAgents = (typeof bootstrap !== 'undefined' && bootstrap.agents) ? bootstrap.agents : [
+          { id: 'nova', name: 'Nova', title: 'CEO & Executive Architect', avatarUrl: '/images/nova-icon.jpg', color: '#06b6d4' },
+          { id: 'astra', name: 'Astra', title: 'Wonder & Synthesis', avatarUrl: '/images/nova-icon.jpg', color: '#c084fc' },
+          { id: 'astaria', name: 'Astaria', title: 'Analyst & Logic', avatarUrl: '/images/nova-icon.jpg', color: '#10b981' }
+        ]; %>
+        <% builtinAgents.filter(a => !a.hidden).forEach((agent, idx) => { %>
+          <%- include('agent_row', { agent, isActive: idx === 0 }) %>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Council Room Quick Action -->
+    <div>
+      <div class="px-2 pb-1.5 flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
+        <span>Multi-Agent Rooms</span>
+        <button
+          type="button"
+          data-nova-action="create-council-room"
+          class="text-cyan-400 hover:text-cyan-300 text-[10px] font-mono"
+          title="Open Council Room with Nova, Astra & Astaria"
+        >+ Council</button>
+      </div>
+      <div id="novaRoomList" class="space-y-1"></div>
+    </div>
+
+    <!-- Custom Sections & Recent Threads -->
+    <div>
+      <div class="px-2 pb-1.5 flex items-center justify-between text-[10px] font-mono uppercase tracking-wider text-slate-400">
+        <span>Conversations</span>
+        <button
+          type="button"
+          data-nova-action="new-section"
+          class="text-slate-400 hover:text-white text-[10px] font-mono"
+          title="Create Sidebar Section"
+        >+ Section</button>
+      </div>
+      <div id="novaSectionsContainer" class="space-y-2"></div>
+      <div id="novaConversationList" class="space-y-1" role="list" aria-label="Recent conversations"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar Footer: Install App, Classic Link & Account (§3.6) -->
+  <div class="p-3 bg-black/20 space-y-2">
+    <%- include('install_button') %>
+    <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+      <a href="/nova/how-it-works" class="hover:text-cyan-300 transition">How Nova works</a>
+      <a href="/novaai/classic" class="hover:text-slate-200 transition" title="Open classic view">Classic UI</a>
+    </div>
+    <%- include('account_button', { user: typeof user !== 'undefined' ? user : null }) %>
+  </div>
+</nav>

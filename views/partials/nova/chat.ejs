@@ -1,0 +1,119 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Center Chat Column (§4, §10, §15.2) -->
+<main id="novaChatColumn" class="nova-chat" aria-label="Active conversation">
+  <!-- Paused Kill-Switch Banner (§15.2) -->
+  <div
+    id="novaPausedBanner"
+    class="nova-paused-banner <%= (typeof bootstrap !== 'undefined' && bootstrap.novaPaused) ? '' : 'hidden' %>"
+    role="status"
+    aria-live="polite"
+  >
+    <div class="flex items-center gap-2">
+      <i data-lucide="pause-circle" class="w-4 h-4 text-rose-400"></i>
+      <span><strong>Nova is paused.</strong> Running jobs, terminal sessions, and automated routines are halted.</span>
+    </div>
+    <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+      <button
+        type="button"
+        id="novaResumeBtn"
+        data-nova-action="resume-nova"
+        class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition"
+      >
+        Resume Nova
+      </button>
+    <% } %>
+  </div>
+
+  <!-- Top Conversation Header (§4.1, §8.1) -->
+  <header class="nova-chat-header">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <button
+        type="button"
+        id="novaTopMenuTrigger"
+        data-nova-action="toggle-nova-menu"
+        class="relative w-9 h-9 rounded-xl overflow-hidden border border-cyan-500/40 p-0.5 bg-black hover:border-cyan-400 transition shrink-0 flex items-center justify-center"
+        title="Open Nova Menu (Chats, Computer, Routines, More)"
+        aria-label="Open Nova Menu"
+        aria-expanded="false"
+      >
+        <img src="/images/nova-icon.jpg?v=20260925" alt="Nova Menu" class="w-full h-full object-cover rounded-lg" />
+      </button>
+      <span id="novaHeaderDot" class="nova-persona-dot" data-persona="nova"></span>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="novaHeaderNameBtn"
+            data-nova-action="toggle-info-pane"
+            aria-expanded="false"
+            class="text-left focus:outline-none"
+          >
+            <h1 id="novaHeaderTitle" class="text-sm font-bold text-white truncate hover:text-cyan-300 transition">Nova</h1>
+          </button>
+          <span id="novaHeaderRoleBadge" class="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+            CEO &amp; Executive Architect
+          </span>
+        </div>
+        <div id="novaHeaderStatus" class="text-[11px] text-slate-400 truncate">
+          Idle &bull; History synced across devices
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <button
+        type="button"
+        id="novaCancelJobBtn"
+        data-nova-action="cancel-job"
+        class="hidden px-2.5 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold"
+      >
+        Stop Reply
+      </button>
+      <button
+        type="button"
+        id="novaInfoPaneToggle"
+        data-nova-action="toggle-info-pane"
+        class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition"
+        title="Toggle Agent Info & Workspace Pane (⌘⇧I)"
+        aria-label="Toggle Agent Info Pane"
+      >
+        <i data-lucide="panel-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Scrollable Message Log (§10: role="log" aria-live="polite") -->
+  <div
+    id="novaMessagesStream"
+    class="nova-chat-stream"
+    role="log"
+    aria-live="polite"
+    aria-relevant="additions"
+  >
+    <!-- Empty State with Persona Quick Prompts (§4.10) -->
+    <div id="novaEmptyState" class="my-auto max-w-xl mx-auto text-center space-y-4 py-10">
+      <div class="w-14 h-14 rounded-2xl mx-auto overflow-hidden border border-cyan-500/40 p-0.5 bg-black shadow-lg">
+        <img src="/images/nova-icon.jpg?v=20260925" alt="Nova" class="w-full h-full object-cover rounded-xl" />
+      </div>
+      <h2 id="novaEmptyHeading" class="text-xl font-bold text-white">What are we building or exploring today?</h2>
+      <p id="novaEmptySubtext" class="text-xs text-slate-400 max-w-md mx-auto">
+        Switch seamlessly between <strong>Nova</strong> (Architecture &amp; Execution), <strong>Astra</strong> (Wonder &amp; Synthesis), and <strong>Astaria</strong> (Analyst &amp; Logic). Each persona keeps its own persistent history.
+      </p>
+      <div id="novaQuickChips" class="flex flex-wrap items-center justify-center gap-2 pt-2">
+        <button type="button" data-quick-prompt="Review our current LLYVerse architecture and suggest next priorities." class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-200 transition">
+          ⚡ System architecture review
+        </button>
+        <button type="button" data-quick-prompt="Help me draft a technical design spec with clear milestones." class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-200 transition">
+          📐 Draft technical spec
+        </button>
+        <button type="button" data-quick-prompt="Summarize today's usage and active routines." class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-slate-200 transition">
+          📊 Check usage &amp; status
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Composer Area -->
+  <%- include('composer') %>
+</main>

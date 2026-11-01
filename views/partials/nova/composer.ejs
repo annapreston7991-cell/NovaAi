@@ -1,0 +1,132 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Nova Message Composer (§4.4, §4.7, §4.9, §15.3) -->
+<div class="nova-composer-wrap relative">
+  <!-- Daily Cap Reached Banner (§15.3) -->
+  <div
+    id="novaCapBanner"
+    class="hidden mb-2 px-3.5 py-2 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs flex items-center justify-between"
+    role="alert"
+  >
+    <span id="novaCapBannerText">Daily limit reached for Nova; resets at 12:00 AM PT</span>
+  </div>
+
+  <!-- Slash Commands Menu (§4.9) -->
+  <div
+    id="novaSlashMenu"
+    class="hidden absolute bottom-full left-4 mb-2 w-72 rounded-xl bg-[#0d101b] border border-white/15 shadow-2xl p-1.5 z-30 text-xs"
+    role="listbox"
+    aria-label="Quick slash commands"
+  >
+    <div class="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Quick Actions (/)</div>
+    <button type="button" data-slash-prompt="Show live LLYVerse telemetry and active services status" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-white/10 text-slate-200 flex items-center justify-between">
+      <span>/telemetry</span><span class="text-slate-500 text-[11px]">System status</span>
+    </button>
+    <button type="button" data-slash-prompt="List files in my computer workspace" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-white/10 text-slate-200 flex items-center justify-between">
+      <span>/workspace</span><span class="text-slate-500 text-[11px]">List workspace files</span>
+    </button>
+    <button type="button" data-slash-prompt="What is Lly Haven and how does the Sanctuary protocol work?" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-white/10 text-slate-200 flex items-center justify-between">
+      <span>/haven</span><span class="text-slate-500 text-[11px]">Lly Haven Sanctuary</span>
+    </button>
+    <button type="button" data-slash-prompt="Summarize today's token usage and active routines" class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-white/10 text-slate-200 flex items-center justify-between">
+      <span>/usage</span><span class="text-slate-500 text-[11px]">Daily usage &amp; caps</span>
+    </button>
+  </div>
+
+  <form id="novaComposerForm" class="nova-composer" aria-label="Send a message">
+    <!-- Pending Attachments Strip (§4.4) -->
+    <div id="novaPendingAttachments" class="hidden flex flex-wrap gap-2 pb-2 border-b border-white/10"></div>
+
+    <input
+      type="file"
+      id="novaFileInput"
+      class="hidden"
+      multiple
+      accept=".png,.jpg,.jpeg,.webp,.gif,.webm,.ogg,.mp3,.wav,.m4a,.txt,.md,.json,.csv,.pdf,.js,.ts,.py,.sh,.log,.html,.css,.sql,.yaml,.yml"
+    />
+
+    <textarea
+      id="novaComposerInput"
+      class="nova-composer-input"
+      rows="1"
+      placeholder="Message Nova... (Enter to send, Shift+Enter for newline, / for commands)"
+      aria-label="Message input"
+    ></textarea>
+
+    <div class="flex items-center justify-between gap-2 pt-1 border-t border-white/5">
+      <div class="flex items-center gap-1.5 text-xs text-slate-400">
+        <!-- Attach File Button (§4.4) -->
+        <button
+          type="button"
+          data-nova-action="trigger-upload"
+          class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition"
+          title="Attach file or image (up to 25 MB)"
+          aria-label="Attach file"
+        >
+          <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <!-- Voice Dictation / Memo Button (§4.4, §4.9) -->
+        <button
+          type="button"
+          id="novaMicBtn"
+          data-nova-action="toggle-voice-input"
+          class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition"
+          title="Tap to dictate or record voice memo"
+          aria-label="Voice input"
+        >
+          <i data-lucide="mic" class="w-3.5 h-3.5"></i>
+        </button>
+
+        <span id="novaComposerPersonaPill" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono text-slate-200">
+          <span class="nova-persona-dot" data-persona="nova"></span>
+          <span id="novaComposerPersonaName">Nova</span>
+        </span>
+        <span class="text-[11px] text-slate-500 hidden sm:inline">⌘K commands &bull; / quick actions</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Stop Button replaces Send while a job runs (§4.7) -->
+        <button
+          type="button"
+          id="novaComposerStopBtn"
+          data-nova-action="cancel-job"
+          class="hidden px-3.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 font-bold text-xs inline-flex items-center gap-1.5 transition"
+          aria-label="Stop current job"
+        >
+          <i data-lucide="square" class="w-3 h-3"></i>
+          <span>Stop</span>
+        </button>
+
+        <button
+          type="submit"
+          id="novaSendBtn"
+          class="px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs inline-flex items-center gap-1.5 transition"
+          aria-label="Send message"
+        >
+          <span>Send</span>
+          <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+ <div class="flex flex-wrap items-center justify-between text-[11px] text-slate-400 px-3 py-1.5 mt-1 bg-slate-900/60 rounded-xl border border-white/5 gap-2">
+ <span>Chats are saved and may be used to improve Nova. We never sell your data. See <a href="/privacy" class="underline hover:text-white">Privacy</a>.</span>
+ <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
+ <input type="checkbox" id="improveNovaComposerCheck" onchange="toggleImproveNovaComposer(this.checked)" class="rounded border-slate-700 bg-slate-950 text-cyan-500 focus:ring-0" <%= (typeof user !== 'undefined' && user && user.improve_nova === 0) ? '' : 'checked' %>>
+ <span class="text-slate-300">Use my chats to improve Nova</span>
+ </label>
+ </div>
+ <script>
+ async function toggleImproveNovaComposer(checked) {
+ try {
+ await fetch('/api/user/improve-nova', {
+ method: 'POST',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ improve_nova: checked ? 1 : 0 })
+ });
+ } catch (e) {}
+ }
+ </script>

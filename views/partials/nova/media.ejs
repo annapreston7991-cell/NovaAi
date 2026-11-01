@@ -1,0 +1,82 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Nova Image Lightbox & File Preview Sheet (§4.4) -->
+<div
+  id="novaMediaLightbox"
+  class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-4"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Media preview"
+>
+  <div class="w-full max-w-4xl flex items-center justify-between mb-3 px-2">
+    <div id="novaLightboxCaption" class="text-xs font-mono text-slate-300 truncate">Image preview</div>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        data-nova-action="lightbox-zoom"
+        class="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs text-white font-semibold"
+      >
+        Zoom
+      </button>
+      <a
+        id="novaLightboxDownload"
+        href="#"
+        download
+        class="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/40 text-xs text-cyan-200 font-semibold"
+      >
+        Download
+      </a>
+      <button
+        type="button"
+        data-nova-action="close-lightbox"
+        class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200"
+        aria-label="Close preview"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+  <div class="max-w-4xl max-h-[80vh] overflow-auto flex items-center justify-center">
+    <img
+      id="novaLightboxImg"
+      src=""
+      alt="Attachment preview"
+      class="max-h-[76vh] w-auto rounded-xl border border-white/15 transition-transform duration-200"
+    />
+  </div>
+</div>
+
+<!-- Text / Code File Side Preview Sheet (§4.4) -->
+<div
+  id="novaFilePreviewSheet"
+  class="hidden fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-[#0d101b] border-l border-white/15 shadow-2xl flex flex-col"
+  role="dialog"
+  aria-modal="true"
+  aria-label="File preview"
+>
+  <header class="h-14 px-4 border-b border-white/10 flex items-center justify-between">
+    <div class="flex items-center gap-2 min-w-0">
+      <i data-lucide="file-code" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+      <span id="novaFilePreviewTitle" class="text-xs font-mono font-bold text-white truncate">file.txt</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <a
+        id="novaFilePreviewDownload"
+        href="#"
+        download
+        class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-xs text-slate-200"
+      >
+        Download
+      </a>
+      <button
+        type="button"
+        data-nova-action="close-file-preview"
+        class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300"
+        aria-label="Close file preview"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+  <pre id="novaFilePreviewContent" class="flex-1 overflow-auto p-4 text-xs font-mono text-slate-200 bg-black/40 whitespace-pre-wrap"></pre>
+</div>

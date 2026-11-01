@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NovaQuestionCard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["widgetId", "prompt", "options"],
+  "properties": {
+    "widgetId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64
+    },
+    "prompt": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "help": {
+      "type": ["string", "null"],
+      "maxLength": 500
+    },
+    "options": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 40
+          },
+          "style": {
+            "type": "string",
+            "enum": ["primary", "default", "danger"]
+          }
+        }
+      }
+    },
+    "multiSelect": {
+      "type": "boolean"
+    },
+    "allowCustom": {
+      "type": "boolean"
+    },
+    "customPlaceholder": {
+      "type": ["string", "null"],
+      "maxLength": 120
+    },
+    "expiresAt": {
+      "type": ["string", "null"]
+    }
+  }
+}

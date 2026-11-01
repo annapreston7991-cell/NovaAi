@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+ <key>PayloadContent</key>
+ <array>
+ <dict>
+ <key>FullScreen</key>
+ <true/>
+ <key>IsRemovable</key>
+ <true/>
+ <key>Label</key>
+ <string>Nova AI</string>
+ <key>PayloadDescription</key>
+ <string>Installs Nova AI Standalone App on iOS Home Screen</string>
+ <key>PayloadDisplayName</key>
+ <string>Nova AI Application</string>
+ <key>PayloadIdentifier</key>
+ <string>org.llyverse.nova.webclip</string>
+ <key>PayloadType</key>
+ <string>com.apple.webClip.managed</string>
+ <key>PayloadUUID</key>
+ <string>7a4b8c2d-9e1f-4a3b-8c5d-2e6f0a1b3c4d</string>
+ <key>PayloadVersion</key>
+ <integer>1</integer>
+ <key>Precomposed</key>
+ <true/>
+ <key>URL</key>
+ <string>https://llyverse.org/nova</string>
+ </dict>
+ </array>
+ <key>PayloadDisplayName</key>
+ <string>Nova AI Standalone iOS Application</string>
+ <key>PayloadIdentifier</key>
+ <string>org.llyverse.nova.profile</string>
+ <key>PayloadOrganization</key>
+ <string>LLYVerse Ecosystem</string>
+ <key>PayloadRemovalDisallowed</key>
+ <false/>
+ <key>PayloadType</key>
+ <string>Configuration</string>
+ <key>PayloadUUID</key>
+ <string>3b2a1c0d-4e5f-6a7b-8c9d-0e1f2a3b4c5d</string>
+ <key>PayloadVersion</key>
+ <integer>1</integer>
+</dict>
+</plist>

@@ -1,0 +1,33 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Command Palette Modal (Cmd/Ctrl+K) (§3.4, §10) -->
+<div
+  id="novaPaletteBackdrop"
+  class="nova-palette-backdrop is-hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Command Palette"
+>
+  <div class="nova-palette">
+    <div class="p-3.5 border-b border-white/10 flex items-center gap-2.5">
+      <i data-lucide="search" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+      <input
+        type="text"
+        id="novaPaletteInput"
+        autocomplete="off"
+        placeholder="Search conversations, messages, memories, or run a command..."
+        class="w-full bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
+        aria-label="Search conversations or commands"
+      />
+      <button
+        type="button"
+        data-nova-action="close-palette"
+        class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-400 hover:text-white"
+      >ESC</button>
+    </div>
+
+    <div id="novaPaletteResults" class="max-h-80 overflow-y-auto p-2 space-y-1" role="listbox">
+      <!-- Populated dynamically by /js/nova/palette.js -->
+    </div>
+  </div>
+</div>

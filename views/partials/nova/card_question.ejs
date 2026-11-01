@@ -1,0 +1,25 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Nova Question Card Partial (§5.1) -->
+<template id="novaQuestionCardTemplate">
+  <div class="nova-card nova-card-question my-1 p-4 rounded-2xl bg-[#101424] border border-cyan-500/30 max-w-xl space-y-3" role="group">
+    <div class="space-y-1">
+      <div class="font-bold text-sm text-white" data-q-prompt></div>
+      <div class="text-xs text-slate-400 hidden" data-q-help></div>
+    </div>
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-2" data-q-options></div>
+    <div class="hidden space-y-2" data-q-custom-wrap>
+      <input
+        type="text"
+        class="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/15 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+        placeholder="Something else..."
+        data-q-custom-input
+      />
+    </div>
+    <div class="hidden pt-1" data-q-submit-wrap>
+      <button type="button" class="px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs transition" data-q-submit>
+        Submit
+      </button>
+    </div>
+  </div>
+</template>

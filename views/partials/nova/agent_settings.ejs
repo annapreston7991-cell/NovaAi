@@ -1,0 +1,81 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Per-Agent Settings Modal (§7.1) -->
+<div id="novaAgentSettingsModal" class="nova-command-backdrop is-hidden hidden" role="dialog" aria-modal="true" aria-labelledby="novaAgentSettingsTitle">
+  <div class="w-full max-w-lg rounded-2xl bg-slate-950 border border-white/15 shadow-2xl overflow-hidden flex flex-col">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between">
+      <div>
+        <h2 id="novaAgentSettingsTitle" class="text-sm font-bold text-white">Configure Persona</h2>
+        <p class="text-[11px] text-slate-400">Customize persona description, voice profile, and instructions.</p>
+      </div>
+      <button
+        type="button"
+        data-nova-action="close-agent-settings"
+        class="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white"
+        aria-label="Close Persona Settings"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <form id="novaAgentSettingsForm" class="p-4 space-y-3.5 text-xs">
+      <input type="hidden" id="novaAgentSettingId" name="id" value="nova" />
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-[11px] text-slate-400 mb-1">Persona Name</label>
+          <input
+            id="novaAgentSettingName"
+            type="text"
+            disabled
+            class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-slate-300"
+          />
+        </div>
+        <div>
+          <label class="block text-[11px] text-slate-400 mb-1">Voice Profile</label>
+          <select id="novaAgentSettingVoice" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white">
+            <option value="nova">Nova (Executive)</option>
+            <option value="astra">Astra (Creative)</option>
+            <option value="astaria">Astaria (Analytical)</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-[11px] text-slate-400 mb-1">Description</label>
+        <textarea
+          id="novaAgentSettingDesc"
+          rows="2"
+          class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white"
+        ></textarea>
+      </div>
+
+      <% if (typeof isOwnerAdmin !== 'undefined' && isOwnerAdmin) { %>
+      <div>
+        <label class="block text-[11px] text-cyan-300 font-mono mb-1">System Prompt (Admin Only)</label>
+        <textarea
+          id="novaAgentSettingPrompt"
+          rows="4"
+          placeholder="Canonical system instructions for this persona..."
+          class="w-full bg-black/50 border border-cyan-500/30 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-200"
+        ></textarea>
+      </div>
+      <% } %>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-white/10">
+        <button
+          type="button"
+          data-nova-action="close-agent-settings"
+          class="px-3 py-1.5 rounded-lg bg-white/5 text-slate-300"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="px-3.5 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold"
+        >
+          Save Persona
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

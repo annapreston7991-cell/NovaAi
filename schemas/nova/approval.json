@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NovaApprovalCard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["widgetId", "title", "details", "action"],
+  "properties": {
+    "widgetId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "details": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "args"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "nova_computer.exec",
+            "nova_computer.write",
+            "nova_computer.delete",
+            "nova_computer.reset",
+            "pantheon.consent_write",
+            "economy.transfer_sparks",
+            "economy.transfer_flames",
+            "economy.payment_xmr",
+            "mail.send",
+            "db.write",
+            "nova.delete_agent",
+            "nova.forget_all_memories",
+            "nova.resume"
+          ]
+        },
+        "args": {
+          "type": "object"
+        }
+      }
+    },
+    "confirm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "style": {
+          "type": "string",
+          "enum": ["danger", "primary", "default"]
+        },
+        "doubleConfirm": {
+          "type": "boolean"
+        }
+      }
+    },
+    "cancel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        }
+      }
+    },
+    "expiresAt": {
+      "type": ["string", "null"]
+    }
+  }
+}

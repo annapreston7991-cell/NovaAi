@@ -1,0 +1,134 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Global Nova Settings Modal (§7.2, §15.3, §15.4, §15.7) -->
+<div id="novaSettingsModal" class="nova-command-backdrop is-hidden hidden" role="dialog" aria-modal="true" aria-labelledby="novaSettingsModalTitle">
+  <div class="w-full max-w-2xl rounded-2xl bg-slate-950 border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between">
+      <div>
+        <h2 id="novaSettingsModalTitle" class="text-sm font-bold text-white">Nova Settings</h2>
+        <p class="text-[11px] text-slate-400">Appearance, Voice Studio, Usage &amp; Caps, Memory &amp; Data, and Update Channel.</p>
+      </div>
+      <button
+        type="button"
+        data-nova-action="close-settings-modal"
+        class="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white"
+        aria-label="Close Settings"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="p-4 overflow-y-auto space-y-5 text-xs">
+      <!-- Appearance: Theme, Accent & Density -->
+      <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-3">
+        <div class="font-bold text-white text-xs uppercase tracking-wider font-mono">Appearance</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Theme</label>
+            <select id="novaSettingTheme" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="dark">Dark (Obsidian)</option>
+              <option value="oled">OLED Pure Black</option>
+              <option value="light">Light</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Accent Color</label>
+            <select id="novaSettingAccent" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="cyan">Cyan (Nova)</option>
+              <option value="violet">Violet (Astra)</option>
+              <option value="emerald">Emerald (Astaria)</option>
+              <option value="amber">Amber</option>
+              <option value="rose">Rose</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Density</label>
+            <select id="novaSettingDensity" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="comfortable">Comfortable</option>
+              <option value="compact">Compact</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- General & Voice Studio -->
+      <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-3">
+        <div class="font-bold text-white text-xs uppercase tracking-wider font-mono">General &amp; Voice Studio</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Timezone</label>
+            <input
+              id="novaSettingTimezone"
+              type="text"
+              value="America/Los_Angeles"
+              class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono"
+            />
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Update Channel</label>
+            <select id="novaSettingChannel" class="w-full bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-white">
+              <option value="stable">Stable</option>
+              <option value="nightly">Nightly</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              data-nova-action="voice-preview"
+              class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/30 text-cyan-200 font-semibold"
+            >
+              Voice Studio Preview
+            </button>
+            <button
+              type="button"
+              data-open-secure-form="elevenlabs"
+              class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300"
+            >
+              Configure ElevenLabs Key
+            </button>
+          </div>
+          <button
+            type="button"
+            data-nova-action="import-local-storage"
+            class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-slate-300 font-mono text-[11px]"
+          >
+            Import Legacy Local Chats
+          </button>
+        </div>
+      </section>
+
+      <!-- Per-Persona Push Notifications (§15.5) -->
+      <%- include('settings_notifications') %>
+
+      <!-- Updates & Install App (§3.6, §7.2) -->
+      <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+        <div class="font-bold text-white text-xs uppercase tracking-wider font-mono">Updates &amp; Standalone App</div>
+        <p class="text-[11px] text-slate-400">Install Nova as a standalone app (<code class="font-mono text-cyan-300">/app</code>) on desktop, iPhone, or Android.</p>
+        <%- include('install_button') %>
+      </section>
+
+      <!-- Usage & Billing + Memory & Backups Info (§15.3, §15.7) -->
+      <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-white text-xs uppercase tracking-wider font-mono">Memory &amp; Encrypted Backups</span>
+          <button
+            type="button"
+            data-nova-action="open-memory-view"
+            class="text-cyan-400 hover:underline font-mono text-[11px]"
+          >
+            Open Memory Vault
+          </button>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          Nightly AES-256-GCM backups run at 3:00 AM PT and are retained for 14 days outside the web root. Deleted chats or memories leave backups within 14 days.
+        </p>
+        <div class="flex items-center justify-between pt-2 border-t border-white/10">
+          <a href="/nova/how-it-works" class="text-[11px] text-cyan-400 hover:underline">How Nova Works</a>
+          <a href="/novaai/classic" class="text-[11px] text-slate-400 hover:text-white font-mono">Classic View (/novaai/classic)</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

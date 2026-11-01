@@ -1,0 +1,141 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!DOCTYPE html>
+<html lang="en" class="dark h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Install Nova — Desktop, iPhone &amp; Android | LLYVerse</title>
+  <meta name="theme-color" content="#020617" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/nova-manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/css/tailwind.min.css" />
+  <link rel="stylesheet" href="/css/output.css" />
+  <script src="/js/lucide.min.js"></script>
+</head>
+<body class="min-h-full flex flex-col bg-slate-950 text-slate-100">
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur px-4 py-3.5 flex items-center justify-between">
+    <a href="/novaai" class="flex items-center gap-3">
+      <img src="/images/nova-icon.jpg?v=20260925" alt="Nova icon" class="w-9 h-9 rounded-xl object-cover border border-cyan-500/40" />
+      <div>
+        <h1 class="font-bold text-sm text-white">Nova</h1>
+        <span class="text-[11px] font-mono text-cyan-400">Installable App &amp; Web Workspace</span>
+      </div>
+    </a>
+    <div class="flex items-center gap-2">
+      <a href="/nova/how-it-works" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition min-h-[44px] flex items-center">
+        How Nova works
+      </a>
+      <a href="/app" class="px-4 py-2 rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white text-xs font-semibold transition min-h-[44px] flex items-center">
+        Open /app &rarr;
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-10 space-y-8">
+    <div class="text-center space-y-3">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono">
+        <i data-lucide="smartphone" class="w-3.5 h-3.5"></i>
+        <span>Standalone App (/app) · Web Experience (/novaai)</span>
+      </div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        Install <span class="text-cyan-400">Nova</span> on Desktop, iPhone &amp; Android
+      </h2>
+      <p class="text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+        Chat with Nova, Astra, and Astaria in a calm, multi-assistant workspace with interactive cards, visible memory, scheduled routines, and Galaxy Fold dual-pane support.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Desktop & Android PWA Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-5">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
+                <i data-lucide="monitor-smartphone" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-white">Desktop &amp; Android PWA</h3>
+                <span class="text-[11px] font-mono text-cyan-400">Chrome · Edge · Android · Galaxy Fold</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">/app</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Installs directly from your browser with one click. Opens in its own standalone window with offline app-shell caching and Web Push notifications.
+          </p>
+        </div>
+
+        <div class="space-y-2.5 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            data-nova-action="install-app"
+            class="w-full py-3 px-4 rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white font-semibold text-xs transition flex items-center justify-center gap-2 min-h-[44px]"
+          >
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Install Nova App</span>
+          </button>
+          <a
+            href="/app"
+            class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition border border-slate-700 flex items-center justify-center gap-2 min-h-[44px]"
+          >
+            <span>Launch /app in Browser</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- iPhone & iPad Card -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between space-y-5">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-white">
+                <i data-lucide="smartphone" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-base text-white">iPhone &amp; iPad</h3>
+                <span class="text-[11px] font-mono text-slate-400">Safari Add to Home Screen &amp; iOS Profile</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">iOS Ready</span>
+          </div>
+          <ol class="text-xs text-slate-300 space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Open <code class="font-mono text-cyan-300">/app</code> in Safari on your iPhone or iPad.</li>
+            <li>Tap <strong>Share</strong>, then tap <strong>Add to Home Screen</strong>.</li>
+            <li>Or install the signed iOS WebClip profile below.</li>
+          </ol>
+        </div>
+
+        <div class="space-y-2.5 pt-4 border-t border-slate-800">
+          <button
+            type="button"
+            onclick="window.NovaInstall && window.NovaInstall.openIosInstallSheet()"
+            class="w-full py-3 px-4 rounded-xl bg-cyan-700 hover:bg-cyan-800 text-white font-semibold text-xs transition flex items-center justify-center gap-2 min-h-[44px]"
+          >
+            <i data-lucide="share" class="w-4 h-4"></i>
+            <span>Show iPhone "Add to Home Screen" Steps</span>
+          </button>
+          <a
+            href="/nova-app.mobileconfig"
+            download
+            class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition border border-slate-700 flex items-center justify-center gap-2 min-h-[44px]"
+          >
+            <i data-lucide="download" class="w-4 h-4 text-cyan-400"></i>
+            <span>Download iOS Profile (.mobileconfig) — Advanced Optional</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <%- include('partials/legal_footer') %>
+  <script src="/js/nova/install.js"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>

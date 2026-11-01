@@ -1,0 +1,330 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Right Agent & Workspace Info Pane (§6, §15.2, §15.3, §15.4) -->
+<aside id="novaInfoPane" class="nova-info-pane is-hidden overflow-y-auto" aria-label="Agent details, computer, routines, memory, usage, and activity">
+  <div class="p-3.5 border-b border-white/10 flex items-center justify-between gap-2 sticky top-0 bg-slate-950/95 backdrop-blur z-10">
+    <div class="text-xs font-bold text-white uppercase tracking-wider font-mono">Inspector &amp; Control</div>
+    <div class="flex items-center gap-1.5">
+      <%- include('stop_button') %>
+      <button
+        type="button"
+        data-nova-action="toggle-info-pane"
+        class="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white"
+        aria-label="Close Info Pane"
+        title="Toggle Info Pane (Cmd+Shift+I)"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4 space-y-4 text-xs">
+    <!-- 1. Active Persona Card (§6.1) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
+          <span id="novaInfoPersonaDot" class="nova-persona-dot" data-persona="nova"></span>
+          <div>
+            <div id="novaInfoPersonaName" class="font-bold text-white text-sm">Nova</div>
+            <div id="novaInfoPersonaTitle" class="text-[11px] text-slate-400">CEO &amp; Executive Architect</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          data-nova-action="open-agent-settings"
+          class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-slate-300 hover:text-white"
+        >
+          Configure
+        </button>
+      </div>
+      <p id="novaInfoPersonaDesc" class="text-slate-300 text-xs leading-relaxed">
+        Autonomous executive companion, systems architect, and LLYVerse orchestrator.
+      </p>
+      <!-- Room Members list (shown when a Council Room is open) -->
+      <div id="novaRoomMembersCard" class="hidden pt-2 border-t border-white/10 space-y-1.5">
+        <div class="text-[10px] font-mono uppercase tracking-wider text-slate-400">Room Members</div>
+        <div id="novaRoomMembersList" class="flex flex-wrap gap-1.5"></div>
+      </div>
+    </section>
+
+    <% if (typeof isOwnerAdmin !== 'undefined' && isOwnerAdmin) { %>
+    <!-- 2. COMPUTER Card — Admin Only (§6.2, §12) -->
+    <section id="novaComputerCard" class="p-3.5 rounded-xl bg-white/5 border border-cyan-500/25 space-y-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-bold text-white tracking-wide">COMPUTER</span>
+          <span id="novaComputerFrameBadge" class="text-[10px] font-mono text-cyan-300">LIVE</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <a
+            href="/novaai/computer"
+            target="_blank"
+            rel="noopener"
+            class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-[10px] font-mono text-slate-300"
+          >
+            Full Screen
+          </a>
+          <button
+            type="button"
+            id="novaResetComputerBtn"
+            data-nova-action="reset-computer"
+            class="px-2 py-0.5 rounded bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-[10px] font-mono text-rose-300"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Computer Tabs: Screen | Files | Terminal -->
+      <div class="flex items-center gap-1 bg-black/40 p-1 rounded-lg border border-white/10" role="tablist">
+        <button
+          type="button"
+          data-computer-tab="screen"
+          class="flex-1 py-1 rounded text-[11px] font-semibold bg-cyan-500/20 text-cyan-200 border border-cyan-400/30"
+        >
+          Screen
+        </button>
+        <button
+          type="button"
+          data-computer-tab="files"
+          class="flex-1 py-1 rounded text-[11px] font-semibold text-slate-400 hover:text-white"
+        >
+          Files
+        </button>
+        <button
+          type="button"
+          data-computer-tab="terminal"
+          class="flex-1 py-1 rounded text-[11px] font-semibold text-slate-400 hover:text-white"
+        >
+          Terminal
+        </button>
+      </div>
+
+      <!-- Tab Panel: Live Desktop Screen Stream -->
+      <div id="novaComputerPanelScreen" data-computer-panel="screen" class="space-y-2">
+        <div class="relative rounded-lg overflow-hidden border border-white/10 bg-slate-950 aspect-video flex items-center justify-center">
+          <img
+            id="novaLiveScreenImg"
+            alt="Nova Linux Desktop Live Stream"
+            class="w-full h-full object-contain"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+          />
+          <div id="novaLiveScreenOverlay" class="absolute inset-0 flex items-center justify-center bg-slate-950/75 text-[11px] font-mono text-slate-400">
+            Connecting live desktop stream...
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+          <span id="novaLiveScreenStatus">Stream idle</span>
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              data-nova-action="open-test-window"
+              class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-300"
+            >
+              + Window
+            </button>
+            <button
+              type="button"
+              data-nova-action="reconnect-screen"
+              class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300"
+            >
+              Reconnect
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Panel: Workspace Files Browser -->
+      <div id="novaComputerPanelFiles" data-computer-panel="files" class="hidden space-y-2">
+        <div class="flex items-center justify-between text-[10px] font-mono text-slate-400">
+          <span id="novaComputerCwdLabel">~/workspace</span>
+          <button
+            type="button"
+            data-nova-action="refresh-computer-files"
+            class="text-cyan-400 hover:underline"
+          >
+            Refresh
+          </button>
+        </div>
+        <div id="novaComputerFilesList" class="max-h-44 overflow-y-auto space-y-1 p-1.5 rounded-lg bg-black/40 border border-white/10 font-mono text-[11px]">
+          <div class="text-slate-500">Loading workspace files...</div>
+        </div>
+        <pre id="novaComputerFilePreview" class="hidden max-h-40 overflow-auto p-2 rounded-lg bg-slate-950 border border-white/10 text-[10px] font-mono text-slate-200"></pre>
+      </div>
+
+      <!-- Tab Panel: Interactive Bash Terminal -->
+      <div id="novaComputerPanelTerminal" data-computer-panel="terminal" class="hidden space-y-2">
+        <div
+          id="novaComputerTerminalOutput"
+          class="h-44 overflow-y-auto p-2 rounded-lg bg-slate-950 border border-white/10 font-mono text-[11px] text-emerald-300 whitespace-pre-wrap"
+        >nova@workstation:~/workspace$ </div>
+        <form id="novaComputerTerminalForm" class="flex items-center gap-1.5">
+          <input
+            id="novaComputerTerminalInput"
+            type="text"
+            placeholder="Run command in ~/workspace (e.g. ls -la)"
+            class="flex-1 bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-[11px] font-mono text-white focus:outline-none focus:border-cyan-400"
+          />
+          <button
+            type="submit"
+            class="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/30 text-cyan-200 font-mono text-[11px]"
+          >
+            Run
+          </button>
+        </form>
+      </div>
+    </section>
+    <% } %>
+
+    <!-- 3. ROUTINES Card (§6.3) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-white">Routines (PT)</span>
+        <button
+          type="button"
+          data-nova-action="toggle-new-routine"
+          class="px-2 py-0.5 rounded bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-[10px] font-mono text-cyan-300"
+        >
+          + New Routine
+        </button>
+      </div>
+      <form id="novaNewRoutineForm" class="hidden space-y-2 p-2.5 rounded-lg bg-black/40 border border-white/10">
+        <input
+          type="text"
+          name="name"
+          placeholder="Routine name (e.g. Morning Brief)"
+          required
+          class="w-full bg-slate-900 border border-white/15 rounded px-2 py-1 text-[11px] text-white"
+        />
+        <input
+          type="text"
+          name="cron"
+          value="0 9 * * *"
+          placeholder="Cron in PT (e.g. 0 9 * * * or * * * * *)"
+          required
+          class="w-full bg-slate-900 border border-white/15 rounded px-2 py-1 text-[11px] font-mono text-cyan-200"
+        />
+        <textarea
+          name="prompt"
+          rows="2"
+          placeholder="Prompt for persona to run on schedule..."
+          required
+          class="w-full bg-slate-900 border border-white/15 rounded px-2 py-1 text-[11px] text-white"
+        ></textarea>
+        <div class="flex justify-end gap-1.5">
+          <button
+            type="button"
+            data-nova-action="toggle-new-routine"
+            class="px-2 py-1 rounded bg-white/5 text-slate-400 text-[10px]"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-2.5 py-1 rounded bg-cyan-500 text-slate-950 font-bold text-[10px]"
+          >
+            Save Routine
+          </button>
+        </div>
+      </form>
+      <div id="novaRoutinesList" class="space-y-1.5 text-[11px] text-slate-300">
+        <div class="text-slate-500">No routines scheduled.</div>
+      </div>
+    </section>
+
+    <!-- 4. MEMORY (N) Card (§6.4, §15.4) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="font-bold text-white">Memory</span>
+          <span id="novaMemoryCountBadge" class="px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-[10px]">0</span>
+        </div>
+        <button
+          type="button"
+          data-nova-action="open-memory-view"
+          class="text-[11px] font-mono text-cyan-400 hover:underline"
+        >
+          Manage
+        </button>
+      </div>
+      <div id="novaMemoryPreviewList" class="space-y-1.5 text-[11px] text-slate-300">
+        <div class="text-slate-500">No memories stored yet.</div>
+      </div>
+    </section>
+
+    <!-- 5. Usage & Daily Caps Card (§15.3) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-white">Today's Usage (PT)</span>
+        <span id="novaUsageDayLabel" class="text-[10px] font-mono text-slate-400">Resets 12:00 AM PT</span>
+      </div>
+      <div id="novaUsageBars" class="space-y-2 text-[11px] text-slate-300">
+        <div>Loading usage metrics...</div>
+      </div>
+    </section>
+
+    <!-- 6. Channels & Connectors Card (§5.2, §6.5) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-white">Channels &amp; Connectors</span>
+        <span class="text-[10px] font-mono text-emerald-300">AES-256-GCM</span>
+      </div>
+      <div id="novaConnectorsList" class="grid grid-cols-2 gap-1.5 text-[11px]">
+        <button type="button" data-open-secure-form="notion" class="px-2.5 py-1.5 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 flex items-center justify-between text-slate-300">
+          <span>Notion</span><span data-connector-badge="notion" class="text-[10px] font-mono text-slate-500">Connect</span>
+        </button>
+        <button type="button" data-open-secure-form="gmail" class="px-2.5 py-1.5 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 flex items-center justify-between text-slate-300">
+          <span>Gmail</span><span data-connector-badge="gmail" class="text-[10px] font-mono text-slate-500">Connect</span>
+        </button>
+        <button type="button" data-open-secure-form="drive" class="px-2.5 py-1.5 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 flex items-center justify-between text-slate-300">
+          <span>Drive</span><span data-connector-badge="drive" class="text-[10px] font-mono text-slate-500">Connect</span>
+        </button>
+        <button type="button" data-open-secure-form="elevenlabs" class="px-2.5 py-1.5 rounded-lg bg-black/40 hover:bg-white/10 border border-white/10 flex items-center justify-between text-slate-300">
+          <span>ElevenLabs</span><span data-connector-badge="elevenlabs" class="text-[10px] font-mono text-slate-500">Key</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 7. Recent Activity Log Card with Persona & Source Filters (§15.2) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-white">Recent Nova Actions</span>
+        <button type="button" data-nova-action="refresh-actions" class="text-[10px] font-mono text-cyan-400 hover:underline">Refresh</button>
+      </div>
+      <div class="grid grid-cols-2 gap-1.5">
+        <select id="novaActivityPersonaFilter" class="bg-black/40 border border-white/10 rounded px-2 py-1 text-[10px] text-slate-300 font-mono">
+          <option value="">All Personas</option>
+          <option value="nova">Nova</option>
+          <option value="astra">Astra</option>
+          <option value="astaria">Astaria</option>
+        </select>
+        <select id="novaActivitySourceFilter" class="bg-black/40 border border-white/10 rounded px-2 py-1 text-[10px] text-slate-300 font-mono">
+          <option value="">All Sources</option>
+          <option value="user">user</option>
+          <option value="routine">routine</option>
+          <option value="test">test</option>
+          <option value="automated">automated</option>
+        </select>
+      </div>
+      <div id="novaActivityList" class="space-y-1.5 text-[11px] text-slate-400 font-mono max-h-48 overflow-y-auto">
+        <div>No recent actions recorded.</div>
+      </div>
+    </section>
+
+    <!-- 8. Past Chats Card (§6.6) -->
+    <section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="font-bold text-white">Past Chats</span>
+        <button
+          type="button"
+          data-nova-action="new-direct-chat"
+          class="text-[10px] font-mono text-cyan-400 hover:underline"
+        >
+          + New
+        </button>
+      </div>
+      <div id="novaPastChatsList" class="space-y-1 text-[11px] text-slate-300 max-h-40 overflow-y-auto"></div>
+    </section>
+  </div>
+</aside>

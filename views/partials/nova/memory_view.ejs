@@ -1,0 +1,98 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Full Memory Manager Modal (§6.4, §7, §15.4) -->
+<div id="novaMemoryModal" class="nova-command-backdrop is-hidden hidden" role="dialog" aria-modal="true" aria-labelledby="novaMemoryModalTitle">
+  <div class="w-full max-w-2xl rounded-2xl bg-slate-950 border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between gap-3">
+      <div>
+        <h2 id="novaMemoryModalTitle" class="text-sm font-bold text-white flex items-center gap-2">
+          <span>Nova Memory Vault</span>
+          <span id="novaMemoryModalCount" class="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono text-xs">0</span>
+        </h2>
+        <p class="text-[11px] text-slate-400">
+          Visible, editable facts shared across personas or scoped to a single agent. Deleted memories also age out of encrypted backups within 14 days.
+        </p>
+      </div>
+      <button
+        type="button"
+        data-nova-action="close-memory-modal"
+        class="p-1.5 rounded-lg bg-white/5 text-slate-400 hover:text-white"
+        aria-label="Close Memory View"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- Search, Filter, Export & Forget Everything Toolbar -->
+    <div class="p-3.5 border-b border-white/10 bg-white/[0.02] flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 flex-1 min-w-[220px]">
+        <input
+          id="novaMemorySearchInput"
+          type="search"
+          placeholder="Search memories..."
+          class="flex-1 bg-black/50 border border-white/15 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400"
+        />
+        <select
+          id="novaMemoryAgentFilter"
+          class="bg-black/50 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono"
+        >
+          <option value="all">All Scopes</option>
+          <option value="shared">Shared (All Personas)</option>
+          <option value="nova">Nova Only</option>
+          <option value="astra">Astra Only</option>
+          <option value="astaria">Astaria Only</option>
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <a
+          href="/api/nova/memories/export"
+          download
+          class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-mono text-cyan-300"
+        >
+          Export JSON
+        </a>
+        <button
+          type="button"
+          id="novaForgetAllMemoriesBtn"
+          data-nova-action="forget-all-memories"
+          class="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-xs font-mono text-rose-300"
+        >
+          Forget everything
+        </button>
+      </div>
+    </div>
+
+    <!-- Add New Memory Form -->
+    <form id="novaAddMemoryForm" class="p-3.5 border-b border-white/10 flex items-center gap-2">
+      <input
+        id="novaNewMemoryTextInput"
+        type="text"
+        name="text"
+        placeholder="Add a fact for Nova to remember (e.g. Prefer concise TypeScript examples)..."
+        required
+        class="flex-1 bg-black/40 border border-white/15 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400"
+      />
+      <select
+        id="novaNewMemoryScopeSelect"
+        name="agentId"
+        class="bg-black/40 border border-white/15 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 font-mono"
+      >
+        <option value="shared">Shared</option>
+        <option value="nova">Nova</option>
+        <option value="astra">Astra</option>
+        <option value="astaria">Astaria</option>
+      </select>
+      <button
+        type="submit"
+        class="px-3 py-1.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs"
+      >
+        + Save
+      </button>
+    </form>
+
+    <!-- Memory List -->
+    <div id="novaMemoryFullList" class="p-4 overflow-y-auto space-y-2 flex-1 text-xs">
+      <div class="text-slate-500">No memories stored.</div>
+    </div>
+  </div>
+</div>

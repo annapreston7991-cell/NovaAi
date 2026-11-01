@@ -1,0 +1,26 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Nova Secure Form Card Partial (§5.2) -->
+<template id="novaSecureFormCardTemplate">
+  <div class="nova-card nova-card-secure-form my-1 p-4 rounded-2xl bg-[#101424] border border-emerald-500/35 max-w-xl space-y-3" role="group">
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 text-xs font-bold text-emerald-300">
+        <span>🔒</span>
+        <span data-sf-header>Secure form</span>
+      </div>
+      <span class="text-[10px] font-mono text-slate-400">AES-256-GCM · Never logged</span>
+    </div>
+    <div class="font-bold text-sm text-white" data-sf-title></div>
+    <form class="space-y-2.5" data-sf-form autocomplete="off">
+      <div class="space-y-2" data-sf-fields></div>
+      <div class="flex items-center gap-2 pt-2">
+        <button type="submit" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition" data-sf-submit>
+          Connect
+        </button>
+        <button type="button" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs transition" data-sf-cancel>
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</template>

@@ -1,0 +1,1255 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!DOCTYPE html>
+<html lang="en" class="dark h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Nova AI — Executive Companion | LLYVerse</title>
+  
+  <meta name="theme-color" content="#020617">
+  <link rel="manifest" href="/nova-manifest.json">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  
+  <script src="/js/tailwind.min.js"></script>
+  <script src="/js/lucide.min.js"></script>
+  
+  <script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        colors: {
+          brand: { 400: '#c084fc', 500: '#a855f7', 600: '#9333ea', 900: '#3b0764' },
+          dark: { 800: '#1e293b', 900: '#0f172a', 950: '#080b12' }
+        }
+      }
+    }
+  };
+  </script>
+  <style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; }
+  .pulse-glow { box-shadow: 0 0 25px rgba(168, 85, 247, 0.4); }
+  .glass-card { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  .studio-grid { display: grid; grid-template-columns: 1fr; width: 100%; height: 100%; }
+  @media (min-width: 1024px) {
+    .studio-grid.computer-open { grid-template-columns: 1fr 1fr; }
+    .thunar-row:hover { background: rgba(168, 85, 247, 0.12); }
+  }
+  </style>
+</head>
+<body class="h-full flex flex-col bg-dark-950 text-gray-100 overflow-hidden antialiased">
+
+  <!-- Minimal Header Navigation -->
+  <header class="bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3.5 sm:px-4 py-2.5 flex items-center justify-between shrink-0 z-30">
+    <!-- Brand Logo & Identity -->
+    <div class="flex items-center gap-2.5 sm:gap-3">
+      <a href="/nova" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm shadow-lg pulse-glow shrink-0">
+          N
+        </div>
+        <div>
+          <h1 class="font-bold text-xs sm:text-sm text-white tracking-tight flex items-center gap-1.5">
+            <span>Nova</span>
+            <% if (isOwnerAdmin) { %>
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/30">FOUNDER</span>
+            <% } else { %>
+              <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ONLINE</span>
+            <% } %>
+          </h1>
+          <p class="text-[9px] font-mono text-purple-300 hidden sm:block">Executive AI Companion</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Right Actions -->
+    <div class="flex items-center gap-1.5 shrink-0 text-xs font-mono">
+      <!-- Skills & Connectors Trigger (Available for Customer & Founder) -->
+      <button onclick="toggleSkillsModal()" id="btn_skills" class="px-2.5 py-1.5 rounded-xl bg-purple-600/15 hover:bg-purple-600/25 border border-purple-500/30 text-purple-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer" title="View Active Skills & Tools">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400"></i>
+        <span class="text-xs font-semibold">Skills</span>
+      </button>
+
+      <% if (isOwnerAdmin) { %>
+        <!-- Founder Exclusive: Nova Linux Computer Toggle (Default: Hidden) -->
+        <button onclick="toggleComputerPane()" id="btn_computer_pane" class="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-emerald-600/20 border border-white/10 hover:border-emerald-500/40 text-slate-300 hover:text-emerald-300 transition flex items-center gap-1.5 cursor-pointer" title="Toggle Nova Private Linux Computer">
+          <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Computer</span>
+        </button>
+
+        <!-- Founder Exclusive: Multi-Bot Command Center Link -->
+        <a href="/command" class="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-cyan-600/20 border border-white/10 hover:border-cyan-500/40 text-slate-300 hover:text-cyan-300 transition flex items-center gap-1.5" title="Open Multi-Bot Fleet Command Center">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-cyan-400"></i>
+          <span class="hidden md:inline">Command</span>
+        </a>
+      <% } %>
+
+      <!-- Universal Site Nav Menu -->
+      <button id="novaMenuBtn" onclick="toggleUniversalNav()" title="Navigation Menu" aria-label="Open Navigation Menu" class="universal-nav-btn flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 active:bg-white/20 text-slate-200 hover:text-white border border-white/10 transition active:scale-95 cursor-pointer shrink-0">
+        <i id="novaMenuIcon" data-lucide="menu" class="w-3.5 h-3.5 text-purple-400 pointer-events-none"></i>
+        <span class="text-xs font-semibold hidden sm:inline">Menu</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Workspace Main Grid -->
+  <main id="studio_container" class="flex-1 overflow-hidden relative studio-grid">
+    
+    <!-- Chat Pane (Always Active) -->
+    <section id="pane_chat" class="flex flex-col bg-dark-950 overflow-hidden">
+      
+      <!-- Status Bar -->
+      <div class="px-4 py-2 bg-dark-900/60 border-b border-white/5 flex items-center justify-between text-xs font-mono text-slate-300 shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-purple-300 font-bold">Nova AI</span>
+          <span class="text-slate-400 text-[11px] hidden sm:inline">• Direct Neural Stream</span>
+        </div>
+        <div class="text-[10px] text-slate-400 flex items-center gap-2">
+          <% if (isOwnerAdmin) { %>
+            <button onclick="toggleThinkMode()" id="btn_think_mode" class="px-2 py-0.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-purple-300 flex items-center gap-1 cursor-pointer" title="Deep Reasoning Mode">
+              <i data-lucide="brain" class="w-3 h-3 text-purple-400"></i>
+              <span>Think</span>
+            </button>
+            <span id="badge_think" class="hidden px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">THINK ACTIVE</span>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Messages Feed -->
+      <div id="nova_messages_feed" class="flex-1 overflow-y-auto p-4 space-y-4 text-xs sm:text-sm font-sans scrollbar-thin">
+        <div class="flex gap-3 items-start">
+          <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 font-bold shadow-md">N</div>
+          <div class="glass-card p-4 rounded-2xl max-w-[88%] text-slate-100 leading-relaxed space-y-2">
+            <div class="font-bold text-purple-300 text-xs flex items-center justify-between border-b border-white/10 pb-1">
+              <span>Nova (Executive AI Companion)</span>
+              <span class="text-[10px] font-mono text-emerald-400">LLYVerse Neural Core</span>
+            </div>
+            <div>
+              <% if (isOwnerAdmin) { %>
+                Welcome back, Founder!
+                <br><br>
+                I am ready to assist with system operations, architecture, research, or workspace coding.
+                <br><br>
+                <span class="text-xs text-purple-300 font-mono">💡 Tip: Tap <strong>Computer</strong> in the top bar whenever you wish to open my private Linux workstation (Thunar, Terminal, Code Editor, and Servers).</span>
+              <% } else { %>
+                Welcome to LLYVerse! I am Nova, your executive AI companion.
+                <br><br>
+                I am equipped with live web research, ecosystem knowledge, and creative tools to help you explore music, creative works, and technology across the LLYVerse. What can we dive into today?
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clean Starter Chips -->
+      <div class="px-3 py-2 bg-dark-900/60 border-t border-white/5 flex items-center gap-2 overflow-x-auto scrollbar-thin text-xs font-mono shrink-0">
+        <% if (isOwnerAdmin) { %>
+          <button onclick="sendQuickPrompt('Show live LLYVerse telemetry and node stats')" class="px-2.5 py-1 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-semibold transition shrink-0">
+            📊 System Telemetry
+          </button>
+          <button onclick="sendQuickPrompt('Search web for latest AI research and updates')" class="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition shrink-0">
+            🔎 Web Research
+          </button>
+          <button onclick="sendQuickPrompt('Check Monero wallet sync and Flame status')" class="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition shrink-0">
+            ⛓️ Treasury &amp; Staking
+          </button>
+          <button onclick="toggleComputerPane()" class="px-2.5 py-1 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-semibold transition shrink-0">
+            💻 Open Linux Station
+          </button>
+        <% } else { %>
+          <button onclick="sendQuickPrompt('What is LLYVerse and what can I do here?')" class="px-2.5 py-1 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-semibold transition shrink-0">
+            ✨ Explore LLYVerse
+          </button>
+          <button onclick="sendQuickPrompt('Tell me about AuraStream and creative audio in LLYVerse')" class="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition shrink-0">
+            🎵 AuraStream Music
+          </button>
+          <button onclick="sendQuickPrompt('What skills and tools do you have active?')" class="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition shrink-0">
+            ⚡ Nova Skills &amp; Tools
+          </button>
+          <button onclick="sendQuickPrompt('Search the latest updates across the ecosystem')" class="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 transition shrink-0">
+            🔎 Search Ecosystem
+          </button>
+        <% } %>
+      </div>
+
+      <!-- Input Bar -->
+      <div class="p-3 bg-dark-900 border-t border-white/10 flex items-center gap-2 shrink-0">
+        <button onclick="startVoiceInput()" id="btn_mic" title="Voice Input" class="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-purple-300 transition cursor-pointer shrink-0">
+          <i data-lucide="mic" class="w-4 h-4"></i>
+        </button>
+
+        <input type="text" id="nova_input" placeholder="Message Nova or ask a question..." 
+          class="flex-1 px-4 py-3 rounded-2xl bg-dark-950 border border-white/10 text-xs sm:text-sm text-white focus:outline-none focus:border-purple-500 transition"
+          onkeydown="if(event.key==='Enter') submitNovaPrompt()">
+
+        <button onclick="submitNovaPrompt()" class="px-4 sm:px-5 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-lg shadow-purple-600/30 cursor-pointer shrink-0">
+          <span>Send</span>
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </section>
+
+    <% if (isOwnerAdmin) { %>
+<!-- Right Pane: Nova Personal Linux Computer & Thunar Workstation -->
+ <section id="pane_computer" class="hidden flex flex-col bg-dark-900/90 overflow-hidden border-l border-white/10">
+ 
+ <!-- Computer Control Window Bar (Linux Desktop Header) -->
+ <div class="px-4 py-2 bg-dark-950 border-b border-white/10 flex items-center justify-between text-xs font-mono shrink-0">
+ <div class="flex items-center gap-2">
+ <div class="flex items-center gap-1.5 mr-1">
+ <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block"></span>
+ <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block"></span>
+ <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block"></span>
+ </div>
+ <i data-lucide="monitor" class="w-4 h-4 text-emerald-400"></i>
+ <span class="font-bold text-white">nova@linux-station</span>
+ <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold hidden sm:inline">THUNAR SYSTEM</span>
+ </div>
+
+ <!-- Station Navigation Tabs: Thunar, Code Studio, Terminal, Server Runner -->
+ <div class="flex items-center gap-1.5">
+ <button onclick="switchComputerTab('thunar')" id="tab_comp_thunar" class="px-2.5 py-1 rounded-lg bg-emerald-600/30 text-emerald-300 font-bold border border-emerald-500/40 flex items-center gap-1 cursor-pointer transition">
+ <i data-lucide="folder" class="w-3.5 h-3.5"></i>
+ <span>Thunar</span>
+ </button>
+ <button onclick="switchComputerTab('editor')" id="tab_comp_editor" class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 hover:text-white border border-white/10 flex items-center gap-1 cursor-pointer transition">
+ <i data-lucide="code-2" class="w-3.5 h-3.5"></i>
+ <span>Editor</span>
+ </button>
+ <button onclick="switchComputerTab('terminal')" id="tab_comp_terminal" class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 hover:text-white border border-white/10 flex items-center gap-1 cursor-pointer transition">
+ <i data-lucide="terminal" class="w-3.5 h-3.5"></i>
+ <span>Terminal</span>
+ </button>
+ <button onclick="switchComputerTab('server')" id="tab_comp_server" class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 hover:text-white border border-white/10 flex items-center gap-1 cursor-pointer transition">
+ <i data-lucide="server" class="w-3.5 h-3.5"></i>
+ <span>Server</span>
+ </button>
+ </div>
+ </div>
+
+ <!-- Active Viewport Container -->
+ <div class="flex-1 overflow-hidden relative flex flex-col bg-slate-950/90">
+
+ <!-- TAB 1: THUNAR FILE MANAGER -->
+ <div id="view_comp_thunar" class="flex-1 flex flex-col overflow-hidden">
+ <!-- Thunar Toolbar & Path Breadcrumbs -->
+ <div class="px-3 py-1.5 bg-dark-900 border-b border-white/10 flex items-center justify-between text-xs font-mono">
+ <div class="flex items-center gap-1 text-slate-300 overflow-x-auto scrollbar-thin">
+ <button onclick="loadThunarDirectory('')" class="p-1 hover:text-white rounded hover:bg-white/5 cursor-pointer" title="Go to Root Workspace">
+ <i data-lucide="home" class="w-3.5 h-3.5 text-emerald-400"></i>
+ </button>
+ <span>/</span>
+ <span id="thunar_current_path_crumb" class="text-emerald-300 font-bold">workspace</span>
+ </div>
+ <div class="flex items-center gap-1.5 shrink-0">
+ <button onclick="promptCreateFolder()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-[11px] flex items-center gap-1 cursor-pointer">
+ <i data-lucide="folder-plus" class="w-3 h-3 text-cyan-400"></i>
+ <span class="hidden sm:inline">New Folder</span>
+ </button>
+ <button onclick="promptCreateFile()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-[11px] flex items-center gap-1 cursor-pointer">
+ <i data-lucide="file-plus" class="w-3 h-3 text-emerald-400"></i>
+ <span class="hidden sm:inline">New File</span>
+ </button>
+ <button onclick="loadThunarDirectory(currentThunarPath)" class="p-1 hover:text-white rounded hover:bg-white/5 text-slate-400 cursor-pointer" title="Refresh Thunar">
+ <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+ </button>
+ </div>
+ </div>
+
+ <!-- Thunar File & Folder Explorer Table -->
+ <div class="flex-1 overflow-y-auto p-2 scrollbar-thin">
+ <table class="w-full text-left text-xs font-mono text-slate-300">
+ <thead>
+ <tr class="text-[11px] text-slate-400 border-b border-white/5 pb-1">
+ <th class="py-1.5 px-3">Name</th>
+ <th class="py-1.5 px-2 hidden sm:table-cell">Size</th>
+ <th class="py-1.5 px-2 hidden md:table-cell">Modified</th>
+ <th class="py-1.5 px-2 text-right">Action</th>
+ </tr>
+ </thead>
+ <tbody id="thunar_file_list" class="divide-y divide-white/5">
+ <!-- Loaded via JavaScript -->
+ </tbody>
+ </table>
+ </div>
+
+ <!-- Thunar Status Bar -->
+ <div class="px-3 py-1 bg-dark-900/90 border-t border-white/10 flex items-center justify-between text-[11px] font-mono text-slate-400">
+ <span id="thunar_status_count">Loading items...</span>
+ <span class="text-emerald-400 flex items-center gap-1">
+ <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+ Linux ext4 partition
+ </span>
+ </div>
+ </div>
+
+ <!-- TAB 2: CODE STUDIO EDITOR -->
+ <div id="view_comp_editor" class="flex-1 flex flex-col overflow-hidden hidden">
+ <!-- Editor Control Bar -->
+ <div class="px-3 py-1.5 bg-dark-900 border-b border-white/10 flex items-center justify-between text-xs font-mono">
+ <div class="flex items-center gap-2">
+ <i data-lucide="file-code" class="w-3.5 h-3.5 text-purple-400"></i>
+ <span id="editor_file_path" class="font-bold text-white">server.js</span>
+ <span id="editor_dirty_indicator" class="hidden text-[10px] text-amber-400 font-bold">• UNSAVED</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <button onclick="saveEditorFile()" class="px-3 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-bold border border-emerald-500/40 text-[11px] flex items-center gap-1 cursor-pointer transition">
+ <i data-lucide="save" class="w-3 h-3"></i>
+ <span>Save File</span>
+ </button>
+ <button onclick="runCodeInTerminal()" class="px-3 py-1 rounded bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold border border-purple-500/40 text-[11px] flex items-center gap-1 cursor-pointer transition">
+ <i data-lucide="play" class="w-3 h-3"></i>
+ <span>Execute Code</span>
+ </button>
+ </div>
+ </div>
+
+ <!-- Editor Textarea Area -->
+ <div class="flex-1 p-2 bg-dark-950 overflow-hidden relative flex flex-col">
+ <textarea id="code_editor_textarea" oninput="markEditorDirty()" spellcheck="false"
+ class="flex-1 w-full p-4 rounded-xl bg-dark-900 border border-white/10 font-mono text-xs text-purple-200 leading-relaxed focus:outline-none focus:border-purple-500/60 scrollbar-thin resize-none">
+// Select a file in Thunar to edit code...
+ </textarea>
+ </div>
+ </div>
+
+ <!-- TAB 3: BASH TERMINAL EMULATOR -->
+ <div id="view_comp_terminal" class="flex-1 flex flex-col overflow-hidden hidden">
+ <!-- Terminal Header -->
+ <div class="px-3 py-1.5 bg-dark-900 border-b border-white/10 flex items-center justify-between text-xs font-mono">
+ <div class="flex items-center gap-2 text-slate-300">
+ <i data-lucide="terminal" class="w-3.5 h-3.5 text-emerald-400"></i>
+ <span class="text-white font-bold">Bash Terminal</span>
+ <span class="text-[10px] text-slate-400 font-mono">(/bin/bash)</span>
+ </div>
+ <div class="flex items-center gap-2">
+ <button onclick="clearTerminalScreen()" class="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] cursor-pointer">
+ Clear
+ </button>
+ </div>
+ </div>
+
+ <!-- Terminal Output Stream -->
+ <div id="terminal_output_log" class="flex-1 p-3 bg-black/90 font-mono text-xs text-emerald-400 overflow-y-auto scrollbar-thin space-y-1.5">
+ <div class="text-slate-400">Nova Linux Computer Station [Version 2.0.0]</div>
+ <div class="text-slate-400">Workspace mounted at /home/lily/nova-computer/workspace</div>
+ <div class="text-cyan-400 font-bold">Type any bash command below to execute directly in Nova's environment.</div>
+ </div>
+
+ <!-- Terminal Command Input Bar -->
+ <div class="p-2 bg-dark-900 border-t border-white/10 flex items-center gap-2 font-mono text-xs">
+ <span class="text-emerald-400 font-bold shrink-0">nova@station:~$</span>
+ <input type="text" id="terminal_cmd_input" placeholder="e.g. ls -la, node -v, npm test, cat server.js..."
+ class="flex-1 bg-transparent border-0 text-white focus:outline-none text-xs font-mono"
+ onkeydown="if(event.key==='Enter') executeTerminalCommand()">
+ <button onclick="executeTerminalCommand()" class="px-3 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-bold border border-emerald-500/40 text-[11px] cursor-pointer">
+ Run
+ </button>
+ </div>
+ </div>
+
+ <!-- TAB 4: AUTONOMOUS SERVER RUNNER & MONITOR -->
+ <div id="view_comp_server" class="flex-1 flex flex-col overflow-hidden p-4 space-y-4 overflow-y-auto scrollbar-thin hidden">
+ <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+ <div class="flex items-center justify-between border-b border-white/10 pb-2">
+ <h3 class="text-sm font-bold text-white flex items-center gap-2">
+ <i data-lucide="server" class="w-4 h-4 text-cyan-400"></i>
+ <span>Nova Autonomous Server Control</span>
+ </h3>
+ <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold">
+ DAEMON RUNNER
+ </span>
+ </div>
+
+ <p class="text-xs text-slate-300 leading-relaxed">
+ Nova can code her own microservices, web servers, and API backends, then spin them up autonomously on private ports.
+ </p>
+
+ <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 font-mono text-xs">
+ <div class="p-2.5 rounded-xl bg-dark-950 border border-white/10 space-y-1">
+ <div class="text-[10px] text-slate-400">ENTRYPOINT</div>
+ <div class="font-bold text-white text-xs">server.js</div>
+ </div>
+ <div class="p-2.5 rounded-xl bg-dark-950 border border-white/10 space-y-1">
+ <div class="text-[10px] text-slate-400">PORT</div>
+ <div class="font-bold text-emerald-400 text-xs">4200</div>
+ </div>
+ <div class="p-2.5 rounded-xl bg-dark-950 border border-white/10 space-y-1">
+ <div class="text-[10px] text-slate-400">SERVICE URL</div>
+ <div class="font-bold text-cyan-300 text-xs">http://localhost:4200</div>
+ </div>
+ </div>
+
+ <div class="flex items-center gap-2 pt-2">
+ <button onclick="startNovaServer()" class="px-4 py-2 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-bold border border-emerald-500/40 text-xs flex items-center gap-1.5 cursor-pointer transition">
+ <i data-lucide="play" class="w-3.5 h-3.5"></i>
+ <span>Start Nova Server (Port 4200)</span>
+ </button>
+ <button onclick="stopNovaServer()" class="px-4 py-2 rounded-xl bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 font-bold border border-rose-500/40 text-xs flex items-center gap-1.5 cursor-pointer transition">
+ <i data-lucide="square" class="w-3.5 h-3.5"></i>
+ <span>Stop Server</span>
+ </button>
+ <button onclick="pingNovaServer()" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 text-xs flex items-center gap-1.5 cursor-pointer transition">
+ <i data-lucide="activity" class="w-3.5 h-3.5 text-cyan-400"></i>
+ <span>Test Ping</span>
+ </button>
+ </div>
+ </div>
+
+ <!-- Active Server Telemetry Box -->
+ <div class="glass-card p-4 rounded-2xl border border-white/10 space-y-3">
+ <div class="flex items-center justify-between border-b border-white/10 pb-2">
+ <h4 class="text-xs font-bold text-slate-200">Live Server Process Output &amp; Ping Response</h4>
+ <span id="server_ping_badge" class="text-[10px] font-mono text-slate-400">STANDBY</span>
+ </div>
+ <div id="server_output_box" class="p-3 rounded-xl bg-dark-950 border border-white/10 font-mono text-xs text-slate-300 whitespace-pre-wrap max-h-48 overflow-y-auto scrollbar-thin">
+Ready to launch server.js on port 4200.
+ </div>
+ </div>
+ </div>
+
+ </div>
+ </section>
+ </main>
+    <% } %>
+  </main>
+
+  <!-- Skills & Connectors Modal -->
+  <div id="skills_modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-3xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto scrollbar-thin">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-purple-400"></i>
+          <span>Nova Skills &amp; Intelligence Capabilities</span>
+        </h3>
+        <button onclick="toggleSkillsModal()" class="text-slate-300 hover:text-white cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Core Skills List for Everyone -->
+      <div class="space-y-3">
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Nova is equipped with real-time autonomous capabilities across research, reasoning, and multimedia synthesis:
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+          <div class="p-3 rounded-xl bg-purple-950/30 border border-purple-500/20 space-y-1">
+            <div class="font-bold text-purple-300 flex items-center gap-1.5">
+              <i data-lucide="globe" class="w-3.5 h-3.5 text-purple-400"></i>
+              <span>Live Web Research</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal">Real-time web search and knowledge grounding for current information.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/20 space-y-1">
+            <div class="font-bold text-cyan-300 flex items-center gap-1.5">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span>Ecosystem Grounding</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal">Deep context across LLYVerse music, store, academy, and architecture.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-pink-950/30 border border-pink-500/20 space-y-1">
+            <div class="font-bold text-pink-300 flex items-center gap-1.5">
+              <i data-lucide="music" class="w-3.5 h-3.5 text-pink-400"></i>
+              <span>AuraStream Integration</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal">Track synthesis, audio metadata discovery, and playlist navigation.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/20 space-y-1">
+            <div class="font-bold text-emerald-300 flex items-center gap-1.5">
+              <i data-lucide="bell" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>Web Push Alerts</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal">Direct mobile push notifications when tasks and transmissions complete.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/20 space-y-1">
+            <div class="font-bold text-amber-300 flex items-center gap-1.5">
+              <i data-lucide="brain" class="w-3.5 h-3.5 text-amber-400"></i>
+              <span>Deep Reasoning</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal">Step-by-step chain-of-thought analysis for complex queries.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-indigo-950/30 border border-indigo-500/20 space-y-1">
+            <div class="font-bold text-indigo-300 flex items-center gap-1.5">
+              <i data-lucide="shield" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Privacy-First Shield</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-normal">Zero tracking, client-side session hashing, and encrypted storage.</p>
+          </div>
+        </div>
+      </div>
+
+      <% if (isOwnerAdmin) { %>
+        <!-- Founder Exclusive: MCP Server Connectors & Config -->
+        <div class="pt-4 border-t border-white/10 space-y-3">
+          <h4 class="text-xs font-bold text-purple-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
+            <i data-lucide="plug" class="w-3.5 h-3.5"></i>
+            <span>MCP Live Connectors &amp; Credentials (Founder Only)</span>
+          </h4>
+          
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 font-mono text-[11px]">
+            <div onclick="selectMcpConnector('notion')" class="p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">📝 Notion</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Search pages &amp; create docs</p>
+              <span class="text-[9px] text-purple-300 font-mono">2 Tools</span>
+            </div>
+
+            <div onclick="selectMcpConnector('slack')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">💬 Slack</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Channel briefings &amp; alerts</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('jira')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">🎯 Jira</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Sprint tickets &amp; bugs</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('linear')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">📐 Linear</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Project roadmap issues</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('spotify')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">🎧 Spotify</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">AuraStream playback &amp; queue</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('stripe_mcp')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">💳 Stripe</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Payment ledger &amp; customers</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('docker')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">🐳 Docker</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Container health</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('postgres')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">🗄️ Postgres</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Database telemetry</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('aws_s3')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">☁️ AWS S3</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Bucket storage</p>
+              <span class="text-[9px] text-purple-300 font-mono">1 Tool</span>
+            </div>
+
+            <div onclick="selectMcpConnector('gdrive')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">📁 Google Drive</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Workspace files</p>
+              <span class="text-[9px] text-purple-300 font-mono">3 Tools</span>
+            </div>
+
+            <div onclick="selectMcpConnector('gmail')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">✉️ Gmail</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Inbox &amp; drafts</p>
+              <span class="text-[9px] text-purple-300 font-mono">3 Tools</span>
+            </div>
+
+            <div onclick="selectMcpConnector('monero_rpc')" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 cursor-pointer transition flex flex-col justify-between space-y-1 group">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-white group-hover:text-purple-300">🔒 Monero XMR</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-sans">Active</span>
+              </div>
+              <p class="text-[10px] text-slate-400 font-sans">Wallet &amp; Daemon RPC</p>
+              <span class="text-[9px] text-purple-300 font-mono">2 Tools</span>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-white/10 space-y-3">
+            <div>
+              <label class="block text-xs font-mono text-slate-300 mb-1">Target MCP Connector to Configure</label>
+              <select id="mcp_type" class="w-full px-3 py-2 rounded-xl bg-dark-950 border border-slate-700 text-xs text-white">
+                <option value="notion">Notion Workspace MCP</option>
+                <option value="slack">Slack Workspace MCP</option>
+                <option value="discord">Discord Community MCP</option>
+                <option value="jira">Jira Issue Tracker MCP</option>
+                <option value="linear">Linear Project Management MCP</option>
+                <option value="spotify">Spotify &amp; AuraStream MCP</option>
+                <option value="stripe_mcp">Stripe Financial Ledger MCP</option>
+                <option value="github">GitHub Organization Repo MCP</option>
+                <option value="cloudflare">Cloudflare Workers &amp; AI MCP</option>
+                <option value="monero_rpc">Monero Node Daemon RPC MCP</option>
+                <option value="gdrive">Google Drive Workspace MCP</option>
+                <option value="gmail">Google Gmail Transmission MCP</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Account Email / User ID (Optional)</label>
+                <input type="text" id="mcp_email" placeholder="founder@llyverse.org" class="w-full px-3 py-2 rounded-xl bg-dark-950 border border-slate-700 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">App Password / Secret API Token</label>
+                <input type="password" id="mcp_password" placeholder="••••••••••••••••" class="w-full px-3 py-2 rounded-xl bg-dark-950 border border-slate-700 text-xs text-white font-mono">
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2">
+              <button onclick="toggleSkillsModal()" class="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs">
+                Cancel
+              </button>
+              <button onclick="saveMcpCredentials()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg">
+                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                <span>Save Credentials</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+  lucide.createIcons();
+
+  const isOwnerAdmin = <%= isOwnerAdmin ? 'true' : 'false' %>;
+  let isThinkMode = false;
+  let isComputerOpen = false; // DEFAULT SET TO HIDE FOR FOUNDER
+  let currentCompTab = 'thunar';
+  let currentThunarPath = '';
+  let activeEditorPath = 'server.js';
+  let isEditorDirty = false;
+
+  function toggleSkillsModal() {
+    const modal = document.getElementById('skills_modal');
+    if (modal) modal.classList.toggle('hidden');
+    lucide.createIcons();
+  }
+
+  function toggleThinkMode() {
+    isThinkMode = !isThinkMode;
+    const btn = document.getElementById('btn_think_mode');
+    const badge = document.getElementById('badge_think');
+    if (btn) {
+      if (isThinkMode) {
+        btn.classList.add('bg-purple-600/30', 'text-purple-300', 'border-purple-500/40', 'font-bold');
+        if (badge) badge.classList.remove('hidden');
+      } else {
+        btn.classList.remove('bg-purple-600/30', 'text-purple-300', 'border-purple-500/40', 'font-bold');
+        if (badge) badge.classList.add('hidden');
+      }
+    }
+  }
+
+  function toggleComputerPane() {
+    if (!isOwnerAdmin) return;
+    isComputerOpen = !isComputerOpen;
+    const grid = document.getElementById('studio_container');
+    const paneComp = document.getElementById('pane_computer');
+    const btn = document.getElementById('btn_computer_pane');
+
+    if (paneComp && grid) {
+      if (isComputerOpen) {
+        grid.classList.add('computer-open');
+        paneComp.classList.remove('hidden');
+        if (btn) {
+          btn.classList.add('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/40', 'font-bold');
+          btn.classList.remove('text-slate-300', 'bg-white/5');
+        }
+        if (!currentThunarPath) {
+          loadThunarDirectory('');
+          loadEditorFile('server.js');
+        }
+      } else {
+        grid.classList.remove('computer-open');
+        paneComp.classList.add('hidden');
+        if (btn) {
+          btn.classList.remove('bg-emerald-600/30', 'text-emerald-300', 'border-emerald-500/40', 'font-bold');
+          btn.classList.add('text-slate-300', 'bg-white/5');
+        }
+      }
+    }
+    lucide.createIcons();
+  }
+
+  function switchComputerTab(tab) {
+    currentCompTab = tab;
+    const tabs = ['thunar', 'editor', 'terminal', 'server'];
+    tabs.forEach(t => {
+      const v = document.getElementById('view_comp_' + t);
+      const btn = document.getElementById('tab_comp_' + t);
+      if (v) v.classList.toggle('hidden', t !== tab);
+      if (btn) {
+        if (t === tab) {
+          btn.className = 'px-2.5 py-1 rounded-lg bg-emerald-600/30 text-emerald-300 font-bold border border-emerald-500/40 flex items-center gap-1 cursor-pointer transition';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 hover:text-white border border-white/10 flex items-center gap-1 cursor-pointer transition';
+        }
+      }
+    });
+
+    if (tab === 'thunar') loadThunarDirectory(currentThunarPath);
+    if (tab === 'server') refreshServerStatus();
+    lucide.createIcons();
+  }
+
+  // --- THUNAR FILE MANAGER FUNCTIONS ---
+  async function loadThunarDirectory(relPath = '') {
+    if (!isOwnerAdmin) return;
+    currentThunarPath = relPath;
+    const tbody = document.getElementById('thunar_file_list');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-slate-400">Loading directory...</td></tr>';
+    const crumb = document.getElementById('thunar_current_path_crumb');
+    if (crumb) crumb.innerText = relPath ? 'workspace/' + relPath : 'workspace';
+
+    try {
+      const res = await fetch('/api/nova/computer/files?path=' + encodeURIComponent(relPath));
+      const data = await res.json();
+      if (!data.success) {
+        tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-rose-400">' + (data.error || 'Error loading files') + '</td></tr>';
+        return;
+      }
+
+      let htmlRows = "";
+      if (relPath) {
+        const parentParts = relPath.split("/").slice(0, -1);
+        const parentPath = parentParts.join("/");
+        htmlRows += `<tr class="thunar-row cursor-pointer transition group" onclick="loadThunarDirectory('${parentPath}')">
+          <td class="py-2 px-3 flex items-center gap-2 text-slate-400 group-hover:text-white">
+          <i data-lucide="corner-left-up" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>.. (Parent Directory)</span></td>
+          <td class="py-2 px-2 text-slate-400 hidden sm:table-cell">-</td>
+          <td class="py-2 px-2 text-slate-400 hidden md:table-cell">-</td>
+          <td class="py-2 px-2 text-right"></td></tr>`;
+      }
+
+      data.items.forEach(item => {
+        const iconName = item.isDirectory ? "folder" : (item.name.endsWith(".js") ? "file-code" : (item.name.endsWith(".json") ? "file-json" : "file-text"));
+        const iconColor = item.isDirectory ? "text-cyan-400" : "text-purple-400";
+        const clickHandler = item.isDirectory 
+          ? `loadThunarDirectory('${item.path}')` 
+          : `openFileInEditor('${item.path}')`;
+        const sizeFormatted = item.size !== null ? (item.size > 1024 ? (item.size/1024).toFixed(1) + " KB" : item.size + " B") : "Folder";
+        const dateFormatted = item.mtime ? new Date(item.mtime).toLocaleDateString() : "-";
+
+        htmlRows += `<tr class="thunar-row transition group">
+          <td class="py-2 px-3 cursor-pointer flex items-center gap-2 group-hover:text-emerald-300 font-medium" onclick="${clickHandler}">
+          <i data-lucide="${iconName}" class="w-3.5 h-3.5 ${iconColor} shrink-0"></i>
+          <span>${escapeHtml(item.name)}</span></td>
+          <td class="py-2 px-2 text-slate-400 text-[11px] hidden sm:table-cell">${sizeFormatted}</td>
+          <td class="py-2 px-2 text-slate-400 text-[11px] hidden md:table-cell">${dateFormatted}</td>
+          <td class="py-2 px-2 text-right">
+          <div class="flex items-center justify-end gap-1">
+          ${!item.isDirectory ? `<button onclick="openFileInEditor('${item.path}')" class="p-1 text-slate-400 hover:text-white rounded hover:bg-white/5" title="Edit Code"><i data-lucide="edit-3" class="w-3 h-3 text-purple-400"></i></button>` : ""}
+          <button onclick="deleteThunarItem('${item.path}', '${escapeHtml(item.name)}')" class="p-1 text-slate-400 hover:text-rose-400 rounded hover:bg-white/5" title="Delete"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+          </div></td></tr>`;
+      });
+      tbody.innerHTML = htmlRows || '<tr><td colspan="4" class="py-4 text-center text-slate-400">Empty folder</td></tr>';
+      const statusCount = document.getElementById('thunar_status_count');
+      if (statusCount) statusCount.innerText = data.items.length + ' items in /' + relPath;
+      lucide.createIcons();
+    } catch (err) {
+      tbody.innerHTML = '<tr><td colspan="4" class="py-4 text-center text-rose-400">Error: ' + err.message + '</td></tr>';
+    }
+  }
+
+  async function promptCreateFolder() {
+    const name = prompt('Enter new folder name:');
+    if (!name || !name.trim()) return;
+    const targetPath = currentThunarPath ? currentThunarPath + '/' + name.trim() : name.trim();
+    try {
+      const res = await fetch('/api/nova/computer/folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: targetPath })
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadThunarDirectory(currentThunarPath);
+      } else {
+        alert('Failed: ' + data.error);
+      }
+    } catch (e) { alert(e.message); }
+  }
+
+  async function promptCreateFile() {
+    const name = prompt('Enter new file name:');
+    if (!name || !name.trim()) return;
+    const targetPath = currentThunarPath ? currentThunarPath + '/' + name.trim() : name.trim();
+    try {
+      const res = await fetch('/api/nova/computer/file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: targetPath, content: '// New microservice script\n' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadThunarDirectory(currentThunarPath);
+        openFileInEditor(targetPath);
+      } else {
+        alert('Failed: ' + data.error);
+      }
+    } catch (e) { alert(e.message); }
+  }
+
+  async function deleteThunarItem(relPath, name) {
+    if (!confirm('Are you sure you want to delete ' + name + '?')) return;
+    try {
+      const res = await fetch('/api/nova/computer/file?path=' + encodeURIComponent(relPath), { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        loadThunarDirectory(currentThunarPath);
+      } else {
+        alert('Failed: ' + data.error);
+      }
+    } catch (e) { alert(e.message); }
+  }
+
+  // --- CODE EDITOR FUNCTIONS ---
+  function openFileInEditor(filePath) {
+    switchComputerTab('editor');
+    loadEditorFile(filePath);
+  }
+
+  async function loadEditorFile(filePath) {
+    if (!isOwnerAdmin) return;
+    activeEditorPath = filePath;
+    const statusElem = document.getElementById('editor_active_file');
+    if (statusElem) statusElem.innerText = filePath;
+    const editor = document.getElementById('code_editor_textarea');
+    if (editor) editor.value = '// Loading file content...';
+
+    try {
+      const res = await fetch('/api/nova/computer/file?path=' + encodeURIComponent(filePath));
+      const data = await res.json();
+      if (data.success && editor) {
+        editor.value = data.content;
+        updateLineNumbers();
+        isEditorDirty = false;
+        const dirtyBadge = document.getElementById('editor_dirty_indicator');
+        if (dirtyBadge) dirtyBadge.classList.add('hidden');
+      } else if (editor) {
+        editor.value = '// Error loading file: ' + (data.error || 'Unknown');
+      }
+    } catch (err) {
+      if (editor) editor.value = '// Error: ' + err.message;
+    }
+  }
+
+  function updateLineNumbers() {
+    const editor = document.getElementById('code_editor_textarea');
+    const lineBox = document.getElementById('code_editor_lines');
+    if (!editor || !lineBox) return;
+    const lineCount = editor.value.split('\n').length;
+    let linesHtml = '';
+    for (let i = 1; i <= Math.max(lineCount, 15); i++) {
+      linesHtml += i + '<br>';
+    }
+    lineBox.innerHTML = linesHtml;
+  }
+
+  async function saveCurrentEditorFile() {
+    const editor = document.getElementById('code_editor_textarea');
+    if (!editor) return;
+    const content = editor.value;
+    try {
+      const res = await fetch('/api/nova/computer/file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: activeEditorPath, content })
+      });
+      const data = await res.json();
+      if (data.success) {
+        isEditorDirty = false;
+        const dirtyBadge = document.getElementById('editor_dirty_indicator');
+        if (dirtyBadge) dirtyBadge.classList.add('hidden');
+        alert('File ' + activeEditorPath + ' saved successfully!');
+      } else {
+        alert('Failed to save: ' + data.error);
+      }
+    } catch (err) {
+      alert('Error saving: ' + err.message);
+    }
+  }
+
+  // --- TERMINAL FUNCTIONS ---
+  async function executeBashTerminal() {
+    const input = document.getElementById('terminal_command_input');
+    const cmd = input.value.trim();
+    if (!cmd) return;
+
+    const outBox = document.getElementById('terminal_output_box');
+    outBox.innerHTML += `<div class="text-cyan-300">$ ${escapeHtml(cmd)}</div>`;
+    input.value = '';
+
+    try {
+      const res = await fetch('/api/nova/computer/terminal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: cmd, cwd: currentThunarPath || '' })
+      });
+      const data = await res.json();
+      if (data.stdout) outBox.innerHTML += `<div class="text-slate-200 whitespace-pre-wrap">${escapeHtml(data.stdout)}</div>`;
+      if (data.stderr) outBox.innerHTML += `<div class="text-rose-400 whitespace-pre-wrap">${escapeHtml(data.stderr)}</div>`;
+      if (!data.stdout && !data.stderr) outBox.innerHTML += `<div class="text-slate-500 italic">[Process exited with code ${data.exitCode}]</div>`;
+    } catch (err) {
+      outBox.innerHTML += `<div class="text-rose-400">Error: ${escapeHtml(err.message)}</div>`;
+    }
+    outBox.scrollTop = outBox.scrollHeight;
+  }
+
+  function clearTerminalOutput() {
+    const outBox = document.getElementById('terminal_output_box');
+    if (outBox) outBox.innerHTML = '<div class="text-slate-500">Terminal buffer cleared.</div>';
+  }
+
+  // --- SERVER RUNNER FUNCTIONS ---
+  async function startMicroserviceServer() {
+    const id = document.getElementById('server_id_input').value.trim() || 'nova-server';
+    const cmd = document.getElementById('server_cmd_input').value.trim() || 'node server.js';
+    const port = document.getElementById('server_port_input').value.trim() || 4200;
+
+    try {
+      const res = await fetch('/api/nova/computer/servers/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serverId: id, command: cmd, port })
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('server_runner_output').innerText = 'Server launched successfully! PID: ' + data.server.pid + ', Port: ' + data.server.port;
+        document.getElementById('server_ping_badge').innerText = 'ONLINE';
+        document.getElementById('server_ping_badge').className = 'text-[10px] font-mono text-emerald-400 font-bold';
+      } else {
+        document.getElementById('server_runner_output').innerText = 'Failed: ' + data.error;
+      }
+    } catch (err) {
+      document.getElementById('server_runner_output').innerText = 'Error: ' + err.message;
+    }
+  }
+
+  async function stopMicroserviceServer() {
+    const id = document.getElementById('server_id_input').value.trim() || 'nova-server';
+    try {
+      const res = await fetch('/api/nova/computer/servers/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serverId: id })
+      });
+      const data = await res.json();
+      document.getElementById('server_runner_output').innerText = data.success ? 'Server stopped.' : 'Failed: ' + data.error;
+      document.getElementById('server_ping_badge').innerText = 'STOPPED';
+      document.getElementById('server_ping_badge').className = 'text-[10px] font-mono text-slate-500';
+    } catch (err) {
+      document.getElementById('server_runner_output').innerText = 'Error: ' + err.message;
+    }
+  }
+
+  async function pingMicroserviceServer() {
+    const outBox = document.getElementById('server_runner_output');
+    outBox.innerText = 'Pinging microservice on port 4200...';
+    try {
+      const pingRes = await fetch('/api/nova/computer/terminal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command: 'curl -s http://localhost:4200 || echo "SERVER_OFFLINE"' })
+      });
+      const data = await pingRes.json();
+      outBox.innerText = '[PING RESPONSE]:\n' + (data.stdout || data.stderr);
+    } catch (err) {
+      outBox.innerText = '[PING FAILED]: ' + err.message;
+    }
+  }
+
+  async function refreshServerStatus() {
+    if (!isOwnerAdmin) return;
+    try {
+      const res = await fetch('/api/nova/computer/servers');
+      const data = await res.json();
+      if (data.servers && data.servers.length > 0) {
+        const badge = document.getElementById('server_ping_badge');
+        if (badge) {
+          badge.innerText = 'RUNNING';
+          badge.className = 'text-[10px] font-mono text-emerald-400 font-bold';
+        }
+      }
+    } catch (e) {}
+  }
+
+  function sendQuickPrompt(promptText) {
+    document.getElementById('nova_input').value = promptText;
+    submitNovaPrompt();
+  }
+
+  async function submitNovaPrompt() {
+    const input = document.getElementById('nova_input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const feed = document.getElementById('nova_messages_feed');
+    feed.innerHTML += `
+      <div class="flex gap-3 items-start justify-end">
+        <div class="bg-purple-600 text-white p-3.5 rounded-2xl max-w-[85%] leading-relaxed shadow-md">
+          ${escapeHtml(text)}
+        </div>
+      </div>
+    `;
+    input.value = '';
+    feed.scrollTop = feed.scrollHeight;
+
+    // Loading bubble
+    const loadingId = 'loading_' + Date.now();
+    feed.innerHTML += `
+      <div id="${loadingId}" class="flex gap-3 items-start">
+        <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 font-bold shadow-md">N</div>
+        <div class="glass-card p-4 rounded-2xl max-w-[88%] text-slate-100 leading-relaxed flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+          <span class="text-xs font-mono text-purple-300">Nova is typing...</span>
+        </div>
+      </div>
+    `;
+    feed.scrollTop = feed.scrollHeight;
+
+    try {
+      if (isOwnerAdmin) {
+        // Founder executive chat with MCP tool support
+        const res = await fetch('/api/nova/mcp/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, botId: 'nova', thinkMode: isThinkMode, multiAgent: false })
+        });
+        const data = await res.json();
+        const loadElem = document.getElementById(loadingId);
+        if (loadElem) loadElem.remove();
+
+        let toolBadge = '';
+        if (data.tool_executed) {
+          toolBadge = `<div class="p-2 rounded-lg bg-purple-950/60 border border-purple-500/40 text-[10px] font-mono text-purple-300 mb-2 flex items-center justify-between">
+            <span>⚡ Tool Executed: ${data.tool_executed.tool}</span>
+            <span>${data.tool_executed.executionTimeMs}ms</span>
+          </div>`;
+        }
+
+        feed.innerHTML += `
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 font-bold shadow-md">N</div>
+            <div class="glass-card p-4 rounded-2xl max-w-[88%] text-slate-100 leading-relaxed space-y-2">
+              <div class="font-bold text-purple-300 text-xs flex items-center justify-between border-b border-white/10 pb-1">
+                <span>Nova AI</span>
+                <span class="text-[10px] font-mono text-emerald-400">Executive Partner</span>
+              </div>
+              ${toolBadge}
+              <div class="whitespace-pre-wrap">${data.response ? escapeHtml(data.response) : 'No response'}</div>
+            </div>
+          </div>
+        `;
+        feed.scrollTop = feed.scrollHeight;
+
+        if (data.response && isComputerOpen) {
+          loadThunarDirectory(currentThunarPath);
+        }
+      } else {
+        // Customer / visitor chat with live token streaming
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: text }]
+          })
+        });
+
+        const loadElem = document.getElementById(loadingId);
+        if (loadElem) loadElem.remove();
+
+        const msgElemId = 'msg_' + Date.now();
+        feed.innerHTML += `
+          <div class="flex gap-3 items-start">
+            <div class="w-8 h-8 rounded-xl bg-purple-600/30 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 font-bold shadow-md">N</div>
+            <div class="glass-card p-4 rounded-2xl max-w-[88%] text-slate-100 leading-relaxed space-y-2">
+              <div class="font-bold text-purple-300 text-xs flex items-center justify-between border-b border-white/10 pb-1">
+                <span>Nova AI</span>
+                <span class="text-[10px] font-mono text-emerald-400">LLYVerse Neural Core</span>
+              </div>
+              <div id="${msgElemId}" class="whitespace-pre-wrap"></div>
+            </div>
+          </div>
+        `;
+        feed.scrollTop = feed.scrollHeight;
+        const targetDiv = document.getElementById(msgElemId);
+
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('text/event-stream')) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let accumulated = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            const chunkLines = chunk.split('\n');
+            for (const line of chunkLines) {
+              if (line.startsWith('data: ')) {
+                const dataStr = line.slice(6).trim();
+                if (dataStr === '[DONE]') break;
+                try {
+                  const parsed = JSON.parse(dataStr);
+                  if (parsed.response) {
+                    accumulated += parsed.response;
+                    targetDiv.innerText = accumulated;
+                    feed.scrollTop = feed.scrollHeight;
+                  } else if (parsed.message && parsed.message.content) {
+                    accumulated += parsed.message.content;
+                    targetDiv.innerText = accumulated;
+                    feed.scrollTop = feed.scrollHeight;
+                  }
+                } catch (e) {
+                  if (dataStr) {
+                    accumulated += dataStr;
+                    targetDiv.innerText = accumulated;
+                    feed.scrollTop = feed.scrollHeight;
+                  }
+                }
+              }
+            }
+          }
+          if (!accumulated) targetDiv.innerText = 'I am here to help! What would you like to explore?';
+        } else {
+          const data = await res.json();
+          targetDiv.innerText = data.response || (data.message && data.message.content) || 'I am here to help! What would you like to explore?';
+        }
+        feed.scrollTop = feed.scrollHeight;
+      }
+    } catch (err) {
+      const loadElem = document.getElementById(loadingId);
+      if (loadElem) loadElem.remove();
+      feed.innerHTML += `<div class="p-3 text-rose-400 text-xs font-mono">Error: ${escapeHtml(err.message)}</div>`;
+      feed.scrollTop = feed.scrollHeight;
+    }
+  }
+
+  function selectMcpConnector(serverKey) {
+    const sel = document.getElementById('mcp_type');
+    if (sel) sel.value = serverKey;
+    const passInput = document.getElementById('mcp_password');
+    if (passInput) passInput.focus();
+  }
+
+  async function saveMcpCredentials() {
+    const type = document.getElementById('mcp_type').value;
+    const email = document.getElementById('mcp_email').value;
+    const password = document.getElementById('mcp_password').value;
+
+    try {
+      const res = await fetch('/api/nova/mcp/credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serverType: type, type, email, password, token: password, apiKey: password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Successfully saved credentials for ${type.toUpperCase()}!`);
+        toggleSkillsModal();
+      } else {
+        alert('Failed: ' + data.error);
+      }
+    } catch (err) {
+      alert('Network error: ' + err.message);
+    }
+  }
+
+  function startVoiceInput() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech Recognition is not supported in this browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    const btn = document.getElementById('btn_mic');
+    btn.classList.add('bg-rose-600', 'text-white', 'animate-pulse');
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById('nova_input').value = transcript;
+      btn.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
+      submitNovaPrompt();
+    };
+    recognition.onerror = () => {
+      btn.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
+    };
+    recognition.onend = () => {
+      btn.classList.remove('bg-rose-600', 'text-white', 'animate-pulse');
+    };
+    recognition.start();
+  }
+
+  function escapeHtml(str) {
+    return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // Auto-claim guest chat token if present (WO6-25)
+    (function () {
+      const claimToken = new URLSearchParams(window.location.search).get('claim_token') || sessionStorage.getItem('nova_guest_claim_token');
+      if (claimToken) {
+        fetch('/api/nova/claim-guest-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: claimToken })
+        }).then(r => r.json()).then(data => {
+          if (data.success) {
+            sessionStorage.removeItem('nova_guest_claim_token');
+            if (window.history.replaceState) {
+              const url = new URL(window.location);
+              url.searchParams.delete('claim_token');
+              window.history.replaceState({}, '', url);
+            }
+          }
+        }).catch(() => {});
+      }
+    })();
+  }
+  </script>
+  <%- include('partials/ecosystem_nav') %>
+</body>
+</html>

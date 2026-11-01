@@ -1,0 +1,35 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Inline Two-Click Danger Approval Card Template (§15.1, §5.3) -->
+<template id="novaApprovalCardTemplate">
+  <div class="nova-card-approval" role="region" aria-label="Action approval required">
+    <div class="flex items-center justify-between gap-2 mb-2">
+      <div class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-300">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-rose-400"></i>
+        <span data-approval-title>Approval Required Before Nova Acts</span>
+      </div>
+      <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300" data-approval-expiry>Expires in 5m</span>
+    </div>
+    <p class="text-xs text-slate-300 mb-2" data-approval-summary>
+      Review the exact action below. Two-click human confirmation is required.
+    </p>
+    <pre class="text-[11px] font-mono bg-black/50 border border-rose-500/30 rounded-lg p-2.5 text-rose-200 overflow-x-auto mb-3" data-approval-details></pre>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition"
+        data-approval-confirm
+      >
+        Approve Action
+      </button>
+      <button
+        type="button"
+        class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 text-xs font-medium transition"
+        data-approval-deny
+      >
+        Reject
+      </button>
+      <span class="text-[11px] text-rose-300 ml-auto hidden" data-approval-status aria-live="assertive"></span>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,36 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Built-in / Custom Agent Sidebar Row (§3.2, §9) -->
+<button
+  type="button"
+  class="nova-agent-row <%= (typeof isActive !== 'undefined' && isActive) ? 'is-active' : '' %>"
+  data-agent-id="<%= agent.id %>"
+  aria-current="<%= (typeof isActive !== 'undefined' && isActive) ? 'page' : 'false' %>"
+  role="option"
+>
+  <div class="relative flex-shrink-0">
+    <img
+      src="<%= agent.avatarUrl || '/images/nova-icon.jpg' %>"
+      alt="<%= agent.name %>"
+      class="w-8 h-8 rounded-lg object-cover border border-white/10"
+    />
+    <span
+      class="nova-persona-dot absolute -bottom-0.5 -right-0.5 border border-black"
+      data-persona="<%= agent.id %>"
+      style="background-color: <%= agent.color || '#06b6d4' %>;"
+    ></span>
+  </div>
+  <div class="min-w-0 flex-1">
+    <div class="flex items-center justify-between gap-2">
+      <span class="font-semibold text-xs truncate text-white"><%= agent.name %></span>
+      <span
+        class="nova-unread-badge hidden"
+        data-agent-unread="<%= agent.id %>"
+        aria-label="0 unread"
+      >0</span>
+    </div>
+    <div class="text-[11px] text-slate-400 truncate" data-agent-subtitle="<%= agent.id %>">
+      <%= agent.title || 'Ready' %>
+    </div>
+  </div>
+</button>

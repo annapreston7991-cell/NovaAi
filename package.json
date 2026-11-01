@@ -1,0 +1,16 @@
+{
+  "name": "@llyverse/nova",
+  "version": "1.0.0",
+  "description": "Nova AI - Conversational Agent, Computer Control, MCP, and Live Workstation",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/check-names.js",
+    "check:names": "node test/check-names.js"
+  },
+  "author": "Lily <248515536+annapreston7991-cell@users.noreply.github.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "express": "^4.21.2",
+    "ejs": "^3.1.10"
+  }
+}

@@ -1,0 +1,58 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Per-Persona Push Notification Preferences (§15.5) -->
+<section class="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-3" id="novaSettingsNotificationsSection">
+  <div class="flex items-center justify-between">
+    <div>
+      <div class="font-bold text-white text-xs uppercase tracking-wider font-mono">Notifications (Web Push)</div>
+      <p class="text-[11px] text-slate-400">Receive alerts when a long task finishes or an action needs your approval.</p>
+    </div>
+    <button
+      type="button"
+      id="novaPushTestBtn"
+      data-nova-action="send-test-push"
+      class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/35 text-cyan-200 font-semibold text-[11px] min-h-[38px]"
+    >
+      Send test notification
+    </button>
+  </div>
+
+  <div class="divide-y divide-white/10 text-xs" id="novaPushPrefsTable">
+    <% const pushPersonas = [
+      { id: 'nova', name: 'Nova', color: '#06b6d4' },
+      { id: 'astra', name: 'Astra', color: '#c084fc' },
+      { id: 'astaria', name: 'Astaria', color: '#10b981' }
+    ]; %>
+    <% pushPersonas.forEach((p) => { %>
+      <div class="py-2.5 flex flex-wrap items-center justify-between gap-3" data-push-persona-row="<%= p.id %>">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full" style="background:<%= p.color %>"></span>
+          <span class="font-semibold text-white"><%= p.name %></span>
+        </div>
+        <div class="flex items-center gap-4">
+          <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer min-h-[36px]">
+            <input
+              type="checkbox"
+              data-push-pref-persona="<%= p.id %>"
+              data-push-pref-field="onTaskDone"
+              checked
+              class="rounded border-white/20 bg-black/50 text-cyan-500 focus:ring-cyan-500"
+            />
+            <span>Task finished</span>
+          </label>
+          <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-300 cursor-pointer min-h-[36px]">
+            <input
+              type="checkbox"
+              data-push-pref-persona="<%= p.id %>"
+              data-push-pref-field="onApproval"
+              checked
+              class="rounded border-white/20 bg-black/50 text-cyan-500 focus:ring-cyan-500"
+            />
+            <span>Approval needed</span>
+          </label>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+  <p id="novaPushStatusNote" class="text-[11px] text-slate-400 font-mono hidden" role="status" aria-live="polite"></p>
+</section>

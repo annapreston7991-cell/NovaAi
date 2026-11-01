@@ -1,0 +1,88 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!DOCTYPE html>
+<html lang="en" class="dark" data-nova-theme="<%= (typeof bootstrap !== 'undefined' && bootstrap && bootstrap.settings && bootstrap.settings.theme) ? bootstrap.settings.theme : 'dark' %>" data-nova-accent="<%= (typeof bootstrap !== 'undefined' && bootstrap && bootstrap.settings && bootstrap.settings.accent) ? bootstrap.settings.accent : 'cyan' %>">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title><%= (typeof isStandaloneApp !== 'undefined' && isStandaloneApp) ? 'Nova' : 'NovaAI Studio — LLYVerse Autonomous Intelligence' %></title>
+  <meta name="description" content="Nova: Multi-assistant workspace for Nova, Astra, and Astaria across the LLYVerse." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nova" />
+  <meta name="theme-color" content="#020617" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/images/nova-icon.jpg" />
+  <link rel="manifest" href="/nova-manifest.json" />
+  <link rel="stylesheet" href="/css/tailwind.min.css" />
+  <link rel="stylesheet" href="/css/output.css?v=20261017v5" />
+  <style>
+    .nova-app-root { height: 100dvh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
+    .nova-shell { display: flex !important; flex-direction: row !important; flex: 1 1 0% !important; min-height: 0 !important; height: 100% !important; width: 100% !important; overflow: hidden !important; }
+    .nova-sidebar { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
+    .nova-chat { flex: 1 1 0% !important; min-width: 0 !important; min-height: 0 !important; height: 100% !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+    .nova-chat-stream { flex: 1 1 0% !important; min-height: 0 !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
+    .nova-info-pane { width: 340px; flex-shrink: 0; height: 100%; min-height: 0; overflow-y: auto; }
+    .is-hidden, .hidden, .nova-top-menu.is-hidden, .nova-top-menu.hidden, .nova-command-backdrop.is-hidden, .nova-palette-backdrop.is-hidden { display: none !important; }
+  </style>
+  <script src="/js/lucide.min.js"></script>
+</head>
+<body class="nova-app-root" data-nova-route="<%= (typeof isStandaloneApp !== 'undefined' && isStandaloneApp) ? 'app' : 'novaai' %>">
+  <% if (typeof isStandaloneApp !== 'undefined' && isStandaloneApp) { %>
+  <!-- Dismissible Install Banner when /app is opened in a normal browser tab (§3.6) -->
+  <div id="novaAppInstallBanner" class="hidden bg-slate-900 border-b border-cyan-500/30 px-4 py-2 text-xs text-slate-200 flex items-center justify-between gap-3 shrink-0 pt-safe">
+    <div class="flex items-center gap-2 min-w-0">
+      <img src="/images/nova-icon.jpg?v=20260925" alt="Nova" class="w-5 h-5 rounded-md object-cover shrink-0" />
+      <span class="truncate"><strong>Install Nova</strong> for a standalone full-screen window and push notifications.</span>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <button type="button" data-nova-action="install-app" class="px-3 py-1 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-xs">
+        Install
+      </button>
+      <button type="button" data-nova-action="dismiss-install-banner" class="p-1 text-slate-400 hover:text-white" aria-label="Dismiss install banner">✕</button>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Main 3-Pane Nova Shell (§3.1, §8) -->
+  <div class="nova-shell">
+    <%- include('partials/nova/sidebar', { user: typeof user !== 'undefined' ? user : null, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
+    <%- include('partials/nova/chat', { user: typeof user !== 'undefined' ? user : null, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
+    <%- include('partials/nova/thread') %>
+    <%- include('partials/nova/info_pane', { user: typeof user !== 'undefined' ? user : null, isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
+  </div>
+
+  <!-- Top-Left Nova Popup Menu (triggered by clicking Nova's icon at top of screen) -->
+  <%- include('partials/nova/mobile_tabs', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+
+  <!-- Command Palette Modal (Cmd/Ctrl+K) -->
+  <%- include('partials/nova/palette') %>
+
+  <!-- Memory Vault, Global Settings & Agent Settings Modals (§6.4, §7, §15.4) -->
+  <%- include('partials/nova/memory_view') %>
+  <%- include('partials/nova/settings') %>
+  <%- include('partials/nova/agent_settings', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+
+  <!-- Media Lightbox & File Preview Sheet (§4.4) -->
+  <%- include('partials/nova/media') %>
+
+  <!-- Interactive Card Templates (§5.1–§5.3, §15.1) -->
+  <%- include('partials/nova/card_question') %>
+  <%- include('partials/nova/card_approval') %>
+  <%- include('partials/nova/card_secure_form') %>
+
+  <script>
+    window.__NOVA_BOOTSTRAP__ = <%- JSON.stringify(typeof bootstrap !== 'undefined' ? bootstrap : null).replace(/</g, '\\u003c') %>;
+  </script>
+  <script src="/js/vendor/marked.min.js"></script>
+  <script src="/js/vendor/dompurify.min.js"></script>
+  <script src="/js/nova/render.js?v=20261017v5"></script>
+  <script src="/js/nova/cards.js?v=20261017v5"></script>
+  <script src="/js/nova/stream.js?v=20261017v5"></script>
+  <script src="/js/nova/palette.js?v=20261017v5"></script>
+  <script src="/js/nova/install.js?v=20261017v5"></script>
+  <script src="/js/nova/gestures.js?v=20261017v5"></script>
+  <script src="/js/nova/push.js?v=20261017v5"></script>
+  <script src="/js/nova/app.js?v=20261017v5"></script>
+</body>
+</html>

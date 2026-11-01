@@ -1,0 +1,25 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<!-- Account & Settings Trigger Button (§3.2) -->
+<div class="flex items-center justify-between gap-2 pt-2 border-t border-white/10">
+  <button
+    type="button"
+    id="novaAccountBtn"
+    class="flex items-center gap-2.5 flex-1 min-w-0 px-2.5 py-2 rounded-xl hover:bg-white/5 transition text-left"
+    data-nova-action="open-settings"
+    aria-label="Open Account and Nova Settings"
+  >
+    <div class="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xs font-bold text-cyan-300 shrink-0">
+      <%= (user && (user.display_name || user.username) ? (user.display_name || user.username).slice(0, 2).toUpperCase() : 'CT') %>
+    </div>
+    <div class="min-w-0 flex-1">
+      <div class="text-xs font-semibold text-white truncate">
+        <%= user ? (user.display_name || user.username) : 'Citizen' %>
+      </div>
+      <div class="text-[10px] font-mono text-slate-400 truncate">
+        <%= user && user.role === 'admin' ? 'Founder · Admin' : 'Citizen Account' %>
+      </div>
+    </div>
+    <i data-lucide="settings" class="w-4 h-4 text-slate-400 shrink-0"></i>
+  </button>
+</div>
