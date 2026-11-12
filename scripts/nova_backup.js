@@ -19,7 +19,7 @@ const crypto = require('crypto');
 const Database = require('better-sqlite3');
 
 // Load .env
-const envPath = path.join(__dirname, '../.env');
+const envPath = path.join(require('../lib/host').getRootDir(), '.env');
 if (fs.existsSync(envPath)) {
   fs.readFileSync(envPath, 'utf8').split('\n').forEach(line => {
     const t = line.trim();
@@ -56,7 +56,7 @@ function deriveKey(rawKey) {
 }
 
 function runBackup({ dbPath = null, backupDir = null, retentionDays = 14 } = {}) {
-  const prodDbPath = dbPath || process.env.DB_PATH || path.join(__dirname, '../data/llyverse.db');
+  const prodDbPath = dbPath || process.env.DB_PATH || path.join(require('../lib/host').getRootDir(), 'data/llyverse.db');
   const targetDir = backupDir || process.env.NOVA_BACKUP_DIR || '/home/lily/nova-backups';
   const key = deriveKey(process.env.NOVA_BACKUP_KEY);
 
@@ -157,7 +157,7 @@ function runBackup({ dbPath = null, backupDir = null, retentionDays = 14 } = {})
   }
 }
 
-if (require.main === module) {
+function main() {
   try {
     const res = runBackup();
     console.log(JSON.stringify(res));
@@ -167,4 +167,6 @@ if (require.main === module) {
   }
 }
 
-module.exports = { runBackup, deriveKey, BACKUP_TABLES };
+if (require.main === module) main();
+
+module.exports = { runBackup, deriveKey, BACKUP_TABLES, main };

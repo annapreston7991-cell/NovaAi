@@ -20,7 +20,7 @@ const Database = require('better-sqlite3');
 const { deriveKey, BACKUP_TABLES } = require('./nova_backup');
 
 function runRestoreDrill({ backupFilePath = null, scratchDbPath = null, keepScratch = false, wrongKey = null } = {}) {
-  const prodDbPath = process.env.DB_PATH || path.join(__dirname, '../data/llyverse.db');
+  const prodDbPath = process.env.DB_PATH || path.join(require('../lib/host').getRootDir(), 'data/llyverse.db');
   const backupDir = process.env.NOVA_BACKUP_DIR || '/home/lily/nova-backups';
 
   let targetBackup = backupFilePath;
@@ -123,7 +123,7 @@ function runRestoreDrill({ backupFilePath = null, scratchDbPath = null, keepScra
   }
 }
 
-if (require.main === module) {
+function main() {
   try {
     const keepScratch = process.argv.includes('--keep');
     const fileArg = process.argv.find(a => a.endsWith('.nova-backup')) || null;
@@ -135,4 +135,6 @@ if (require.main === module) {
   }
 }
 
-module.exports = { runRestoreDrill };
+if (require.main === module) main();
+
+module.exports = { runRestoreDrill, main };

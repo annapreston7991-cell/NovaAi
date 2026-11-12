@@ -40,7 +40,8 @@
             "db.write",
             "nova.delete_agent",
             "nova.forget_all_memories",
-            "nova.resume"
+            "nova.resume",
+            "plugin.run"
           ]
         },
         "args": {

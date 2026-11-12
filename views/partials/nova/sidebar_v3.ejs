@@ -1,180 +1,64 @@
 <%# Copyright (c) 2026 LLYVerse — https://llyverse.org
     Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
-<!-- NOVA-UI-3: Desktop Slim Sidebar (248px) with 5 Expandable Groups -->
-<aside id="novaV3Sidebar" class="w-[248px] shrink-0 bg-dark-950/95 border-r border-white/10 flex flex-col h-full overflow-hidden select-none z-20 transition-all duration-200">
-  <!-- Brand & Nova Identity -->
-  <div class="p-3.5 border-b border-white/10 flex items-center justify-between gap-2">
-    <a href="/novaai" class="flex items-center gap-2.5 min-w-0 group">
-      <div class="w-8 h-8 rounded-xl overflow-hidden border border-cyan-500/40 p-0.5 bg-dark-900 group-hover:scale-105 transition-transform shrink-0">
-        <img src="/images/nova-icon.jpg" alt="Nova" class="w-full h-full object-cover rounded-lg" />
-      </div>
-      <div class="min-w-0">
-        <div class="text-sm font-bold text-white tracking-tight flex items-center gap-1.5">
-          <span>Nova</span>
-          <span class="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">v3</span>
-        </div>
-        <div class="text-[10px] font-mono text-slate-400 truncate">Intelligence Node</div>
-      </div>
-    </a>
-    <button type="button" data-nova-action="open-palette" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition" title="Search & Command Palette (⌘K)" aria-label="Open command palette">
-      <i data-lucide="search" class="w-3.5 h-3.5"></i>
+<%#
+  Nova layout v3 sidebar (NOVA-UI-3). Rendered from services/nova_menu.js.
+  Keeps id="novaSidebar" and the live list ids (#novaAgentList, #novaRoomList,
+  #novaSectionsContainer, #novaConversationList) so app.js and gestures.js keep
+  working (phone drawer, swipe, unread badges, switching chats).
+  The Admin group only exists in `menu` for the owner (filtered on the server).
+%>
+<nav id="novaSidebar" class="nova-sidebar nova-v3-sidebar" aria-label="Nova menu">
+  <div class="nova-v3-brand">
+    <button type="button" class="nova-v3-brand-btn" data-nova-v3="open-group:explore" aria-label="Nova. Open Explore">
+      <img src="/images/nova-icon.jpg?v=20260925" alt="" class="nova-v3-logo" />
+      <span class="nova-v3-brand-name">Nova</span>
+    </button>
+    <button type="button" class="nova-v3-icon-btn nova-v3-phone-only" data-nova-v3="close-drawer" aria-label="Close menu">
+      <i data-lucide="x" aria-hidden="true"></i>
     </button>
   </div>
 
-  <!-- Primary Action: New Chat (Always Visible) -->
-  <div class="p-2.5 border-b border-white/5">
-    <button type="button" data-nova-action="new-chat" class="w-full py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 active:scale-[0.99] text-white font-medium text-xs flex items-center justify-between shadow-lg shadow-cyan-600/20 transition">
-      <span class="flex items-center gap-2">
-        <i data-lucide="plus" class="w-4 h-4"></i>
-        <span>New Chat</span>
-      </span>
-      <kbd class="text-[10px] font-mono opacity-70">⌘N</kbd>
-    </button>
+  <div class="nova-v3-scroll">
+    <% (menu || []).forEach(function (group) { %>
+    <section class="nova-v3-group" data-group-id="<%= group.id %>">
+      <h2 class="nova-v3-group-heading">
+        <button type="button" class="nova-v3-group-btn" aria-expanded="<%= group.id === 'chats' ? 'true' : 'false' %>" aria-controls="novaV3Group-<%= group.id %>" id="novaV3GroupBtn-<%= group.id %>">
+          <i data-lucide="<%= group.icon %>" aria-hidden="true"></i>
+          <span><%= group.label %></span>
+          <i data-lucide="chevron-down" class="nova-v3-chevron" aria-hidden="true"></i>
+        </button>
+      </h2>
+      <div class="nova-v3-group-body" id="novaV3Group-<%= group.id %>" role="group" aria-labelledby="novaV3GroupBtn-<%= group.id %>"<% if (group.id !== 'chats') { %> hidden<% } %>>
+        <% group.items.forEach(function (item) { %>
+          <% if (item.list === 'personas') { %>
+            <div class="nova-v3-list-label"><%= item.label %> <span id="novaTotalUnreadBadge" class="nova-unread-badge hidden" aria-live="polite">0 unread</span></div>
+            <div id="novaAgentList" class="nova-v3-list" role="listbox" aria-label="Personas">
+              <% const agents = (typeof bootstrap !== 'undefined' && bootstrap && bootstrap.agents && bootstrap.agents.length) ? bootstrap.agents : [
+                { id: 'nova', name: 'Nova', title: 'Guide, builder & companion', avatarUrl: '/images/nova-icon.jpg', color: '#06b6d4' },
+                { id: 'astra', name: 'Astra', title: 'Wonder & Synthesis', avatarUrl: '/images/nova-icon.jpg', color: '#c084fc' },
+                { id: 'astaria', name: 'Astaria', title: 'Analyst & Logic', avatarUrl: '/images/nova-icon.jpg', color: '#10b981' }
+              ]; %>
+              <% agents.filter(function (a) { return !a.hidden; }).forEach(function (agent, idx) { %>
+                <%- include('agent_row', { agent: agent, isActive: idx === 0 }) %>
+              <% }); %>
+            </div>
+          <% } else if (item.list === 'rooms') { %>
+            <div class="nova-v3-list-label"><%= item.label %></div>
+            <div id="novaRoomList" class="nova-v3-list"></div>
+          <% } else if (item.list === 'conversations') { %>
+            <div class="nova-v3-list-label"><%= item.label %></div>
+            <div id="novaSectionsContainer" class="nova-v3-list"></div>
+            <div id="novaConversationList" class="nova-v3-list" role="list" aria-label="Recent conversations"></div>
+          <% } else { %>
+            <%- include('v3_item', { item: item }) %>
+          <% } %>
+        <% }); %>
+      </div>
+    </section>
+    <% }); %>
   </div>
 
-  <!-- 5-Group Expandable Navigation List -->
-  <div class="flex-1 overflow-y-auto px-2 py-2 space-y-1.5 scrollbar-thin text-xs">
-    <!-- Group 1: Chats -->
-    <div class="nova-v3-group" data-group-id="chats">
-      <button type="button" class="nova-v3-group-btn w-full px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 flex items-center justify-between font-semibold transition" aria-expanded="true">
-        <span class="flex items-center gap-2">
-          <i data-lucide="message-square" class="w-3.5 h-3.5 text-cyan-400"></i>
-          <span>Chats</span>
-        </span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-200 group-arrow"></i>
-      </button>
-      <div class="nova-v3-subitems pl-6 pr-1 py-1 space-y-0.5">
-        <button type="button" data-nova-action="create-council-room" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="users" class="w-3 h-3 text-indigo-400"></i>
-          <span>Council Room</span>
-        </button>
-        <button type="button" data-nova-action="new-section" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="folder-plus" class="w-3 h-3 text-amber-400"></i>
-          <span>New Folder</span>
-        </button>
-        <button type="button" data-nova-action="import-local-storage" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="download-cloud" class="w-3 h-3 text-emerald-400"></i>
-          <span>Import Chats</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Group 2: Workspace -->
-    <div class="nova-v3-group" data-group-id="workspace">
-      <button type="button" class="nova-v3-group-btn w-full px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 flex items-center justify-between font-semibold transition" aria-expanded="true">
-        <span class="flex items-center gap-2">
-          <i data-lucide="briefcase" class="w-3.5 h-3.5 text-purple-400"></i>
-          <span>Workspace</span>
-        </span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-200 group-arrow"></i>
-      </button>
-      <div class="nova-v3-subitems pl-6 pr-1 py-1 space-y-0.5">
-        <button type="button" data-nova-action="toggle-info-pane" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="layout-sidebar-reverse" class="w-3 h-3 text-purple-400"></i>
-          <span>Inspector Panel</span>
-        </button>
-        <button type="button" data-nova-action="open-memory-view" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="brain" class="w-3 h-3 text-cyan-400"></i>
-          <span>Memory Vault</span>
-        </button>
-        <button type="button" data-nova-action="toggle-new-routine" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="calendar" class="w-3 h-3 text-blue-400"></i>
-          <span>Routines</span>
-        </button>
-        <button type="button" data-nova-action="open-agent-settings" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="sliders" class="w-3 h-3 text-indigo-400"></i>
-          <span>Persona Settings</span>
-        </button>
-        <button type="button" data-nova-action="refresh-actions" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate flex items-center gap-1.5">
-          <i data-lucide="activity" class="w-3 h-3 text-emerald-400"></i>
-          <span>Activity Log</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Group 3: Explore -->
-    <div class="nova-v3-group" data-group-id="explore">
-      <button type="button" class="nova-v3-group-btn w-full px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 flex items-center justify-between font-semibold transition" aria-expanded="false">
-        <span class="flex items-center gap-2">
-          <i data-lucide="compass" class="w-3.5 h-3.5 text-blue-400"></i>
-          <span>Explore</span>
-        </span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-200 -rotate-90 group-arrow"></i>
-      </button>
-      <div class="nova-v3-subitems hidden pl-6 pr-1 py-1 space-y-0.5">
-        <a href="/" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">LLYVerse Home</a>
-        <a href="/aurastream" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">AuraStream Music</a>
-        <a href="/studio" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Creative Studio</a>
-        <a href="/academy" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">The Academy & ERT</a>
-        <a href="/store" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Store & QuikDocs</a>
-        <a href="/blog" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Community Forum</a>
-        <a href="/haven" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Haven Sanctuary</a>
-        <a href="/nova/how-it-works" class="block px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">How Nova Works</a>
-      </div>
-    </div>
-
-    <!-- Group 4: Settings -->
-    <div class="nova-v3-group" data-group-id="settings">
-      <button type="button" class="nova-v3-group-btn w-full px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 flex items-center justify-between font-semibold transition" aria-expanded="false">
-        <span class="flex items-center gap-2">
-          <i data-lucide="settings" class="w-3.5 h-3.5 text-slate-400"></i>
-          <span>Settings</span>
-        </span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500 transition-transform duration-200 -rotate-90 group-arrow"></i>
-      </button>
-      <div class="nova-v3-subitems hidden pl-6 pr-1 py-1 space-y-0.5">
-        <button type="button" data-nova-action="open-settings" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">General Settings</button>
-        <button type="button" data-nova-action="open-settings" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Theme & Sound</button>
-        <button type="button" data-nova-action="send-test-push" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Push Notifications</button>
-        <button type="button" data-nova-action="install-app" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-slate-200 hover:bg-white/5 truncate">Install Nova App</button>
-      </div>
-    </div>
-
-    <!-- Group 5: Admin (Rendered server-side ONLY when isOwnerAdmin is true) -->
-    <% if (typeof isOwnerAdmin !== 'undefined' && isOwnerAdmin) { %>
-    <div class="nova-v3-group border-t border-purple-500/20 pt-1.5 mt-1.5" data-group-id="admin">
-      <button type="button" class="nova-v3-group-btn w-full px-2.5 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-500/10 flex items-center justify-between font-semibold transition" aria-expanded="false">
-        <span class="flex items-center gap-2">
-          <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-purple-400"></i>
-          <span>Admin</span>
-        </span>
-        <i data-lucide="chevron-down" class="w-3 h-3 text-purple-400/60 transition-transform duration-200 -rotate-90 group-arrow"></i>
-      </button>
-      <div class="nova-v3-subitems hidden pl-6 pr-1 py-1 space-y-0.5">
-        <button type="button" data-nova-action="reconnect-screen" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-purple-200 hover:bg-purple-500/10 truncate flex items-center gap-1.5">
-          <i data-lucide="monitor" class="w-3 h-3 text-cyan-400"></i>
-          <span>Live Desktop</span>
-        </button>
-        <button type="button" data-nova-action="refresh-computer-files" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-purple-200 hover:bg-purple-500/10 truncate flex items-center gap-1.5">
-          <i data-lucide="folder-git-2" class="w-3 h-3 text-indigo-400"></i>
-          <span>Workspace Files</span>
-        </button>
-        <button type="button" data-nova-action="open-test-window" class="w-full text-left px-2 py-1 rounded text-slate-400 hover:text-purple-200 hover:bg-purple-500/10 truncate flex items-center gap-1.5">
-          <i data-lucide="app-window" class="w-3 h-3 text-emerald-400"></i>
-          <span>Test Window</span>
-        </button>
-        <a href="/admin" class="block px-2 py-1 rounded text-slate-400 hover:text-purple-200 hover:bg-purple-500/10 truncate">Admin Console</a>
-        <a href="/training" class="block px-2 py-1 rounded text-slate-400 hover:text-purple-200 hover:bg-purple-500/10 truncate">Training Studio</a>
-        <a href="/agent-tasks" class="block px-2 py-1 rounded text-slate-400 hover:text-purple-200 hover:bg-purple-500/10 truncate">Agent Tasks</a>
-        <button type="button" data-nova-action="stop-nova" class="w-full text-left px-2 py-1 rounded text-rose-400 hover:text-rose-200 hover:bg-rose-500/10 truncate flex items-center gap-1.5">
-          <i data-lucide="octagon" class="w-3 h-3 text-rose-400"></i>
-          <span>Emergency Stop</span>
-        </button>
-      </div>
-    </div>
-    <% } %>
+  <div class="nova-v3-footer">
+    <%- include('account_button', { user: typeof user !== 'undefined' ? user : null }) %>
   </div>
-
-  <!-- Bottom: User Chip & Settings -->
-  <div class="p-3 border-t border-white/10 flex items-center justify-between text-xs">
-    <div class="flex items-center gap-2 min-w-0">
-      <div class="w-6 h-6 rounded-full bg-cyan-700 text-white font-bold flex items-center justify-center text-[10px] shrink-0">
-        <%= (typeof user !== 'undefined' && user && user.username) ? user.username.charAt(0).toUpperCase() : 'U' %>
-      </div>
-      <span class="text-slate-300 font-medium truncate"><%= (typeof user !== 'undefined' && user && user.username) ? user.username : 'User' %></span>
-    </div>
-    <button type="button" data-nova-action="open-settings" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition" title="Settings" aria-label="Open settings">
-      <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
-    </button>
-  </div>
-</aside>
+</nav>

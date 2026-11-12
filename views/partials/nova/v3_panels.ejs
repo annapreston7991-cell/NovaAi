@@ -1,0 +1,23 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<%# Extra pieces for layout v3: "Where did it go?" note and (owner only) Fleet telemetry. %>
+<div id="novaV3WhereNote" class="nova-v3-note" role="status" hidden>
+  <p><strong>Nova has a simpler menu.</strong> Chats, Workspace, Explore and Settings hold everything that used to be in the old menus. Press <kbd>⌘K</kbd> (or Search) to find anything by name.</p>
+  <div class="nova-v3-note-actions">
+    <button type="button" class="nova-v3-btn" data-nova-v3="dismiss-note">Got it</button>
+    <button type="button" class="nova-v3-btn is-quiet" data-nova-v3="layout:v2">Use the old layout</button>
+  </div>
+</div>
+
+<% if (typeof isOwnerAdmin !== 'undefined' && isOwnerAdmin) { %>
+<div id="novaV3TelemetryModal" class="nova-command-backdrop is-hidden hidden" role="dialog" aria-modal="true" aria-labelledby="novaV3TelemetryTitle">
+  <div class="nova-v3-dialog">
+    <div class="nova-v3-sheet-head">
+      <h2 id="novaV3TelemetryTitle">Fleet telemetry</h2>
+      <button type="button" class="nova-v3-icon-btn" data-nova-v3="close-telemetry" aria-label="Close fleet telemetry"><i data-lucide="x" aria-hidden="true"></i></button>
+    </div>
+    <p class="nova-v3-sheet-hint">Owner only. Live compute nodes reporting in the last few minutes.</p>
+    <div id="novaV3TelemetryBody" class="nova-v3-telemetry" aria-live="polite">Loading…</div>
+  </div>
+</div>
+<% } %>
