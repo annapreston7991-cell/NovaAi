@@ -1,0 +1,13 @@
+<%# Copyright (c) 2026 LLYVerse — https://llyverse.org
+    Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required. %>
+<%# One menu item from services/nova_menu.js (shared by the sidebar and the phone sheets) %>
+<% const cls = 'nova-v3-item' + (item.danger ? ' is-danger' : '') + (item.primary ? ' is-primary' : ''); %>
+<% if (item.href) { %>
+<a href="<%= item.href %>" class="<%= cls %>" data-menu-id="<%= item.id %>">
+  <i data-lucide="<%= item.icon %>" aria-hidden="true"></i><span><%= item.label %></span>
+</a>
+<% } else { %>
+<button type="button" class="<%= cls %>" data-menu-id="<%= item.id %>"<% if (item.action) { %> data-nova-action="<%= item.action %>"<% } %><% if (item.v3) { %> data-nova-v3="<%= item.v3 %>"<% } %>>
+  <i data-lucide="<%= item.icon %>" aria-hidden="true"></i><span><%= item.label %></span><% if (item.shortcut) { %><kbd class="nova-v3-kbd" aria-hidden="true"><%= item.shortcut %></kbd><% } %>
+</button>
+<% } %>

@@ -16,6 +16,7 @@
   <link rel="manifest" href="/nova-manifest.json" />
   <link rel="stylesheet" href="/css/tailwind.min.css" />
   <link rel="stylesheet" href="/css/output.css?v=20261017v5" />
+  <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %><link rel="stylesheet" href="/css/nova-v3.css?v=20261111v3" /><% } %>
   <style>
     .nova-app-root { height: 100dvh; width: 100vw; overflow: hidden; display: flex; flex-direction: column; }
     .nova-shell { display: flex !important; flex-direction: row !important; flex: 1 1 0% !important; min-height: 0 !important; height: 100% !important; width: 100% !important; overflow: hidden !important; }
@@ -27,7 +28,7 @@
   </style>
   <script src="/js/lucide.min.js"></script>
 </head>
-<body class="nova-app-root" data-nova-route="<%= (typeof isStandaloneApp !== 'undefined' && isStandaloneApp) ? 'app' : 'novaai' %>">
+<body class="nova-app-root<%= (typeof useUiV3 !== 'undefined' && useUiV3) ? ' nova-v3' : '' %>" data-nova-route="<%= (typeof isStandaloneApp !== 'undefined' && isStandaloneApp) ? 'app' : 'novaai' %>">
   <% if (typeof isStandaloneApp !== 'undefined' && isStandaloneApp) { %>
   <!-- Dismissible Install Banner when /app is opened in a normal browser tab (§3.6) -->
   <div id="novaAppInstallBanner" class="hidden bg-slate-900 border-b border-cyan-500/30 px-4 py-2 text-xs text-slate-200 flex items-center justify-between gap-3 shrink-0 pt-safe">
@@ -47,7 +48,7 @@
   <!-- Main Nova Shell: Switches between v2 and v3 (NOVA-UI-1) -->
   <div class="nova-shell">
     <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %>
-      <%- include('partials/nova/sidebar_v3', { user: typeof user !== 'undefined' ? user : null, isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+      <%- include('partials/nova/sidebar_v3', { user: typeof user !== 'undefined' ? user : null, menu: typeof novaMenu !== 'undefined' ? novaMenu : [], bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
     <% } else { %>
       <%- include('partials/nova/sidebar', { user: typeof user !== 'undefined' ? user : null, bootstrap: typeof bootstrap !== 'undefined' ? bootstrap : undefined }) %>
     <% } %>
@@ -58,7 +59,8 @@
 
   <!-- Mobile Navigation / Sheets -->
   <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %>
-    <%- include('partials/nova/mobile_tabs_v3', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
+    <%- include('partials/nova/mobile_tabs_v3', { menu: typeof novaMenu !== 'undefined' ? novaMenu : [] }) %>
+    <%- include('partials/nova/v3_panels', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
   <% } else { %>
     <%- include('partials/nova/mobile_tabs', { isOwnerAdmin: typeof isOwnerAdmin !== 'undefined' ? isOwnerAdmin : false }) %>
   <% } %>
@@ -81,16 +83,18 @@
 
   <script>
     window.__NOVA_BOOTSTRAP__ = <%- JSON.stringify(typeof bootstrap !== 'undefined' ? bootstrap : null).replace(/</g, '\\u003c') %>;
+    <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %>window.__NOVA_MENU__ = <%- JSON.stringify(typeof novaMenuIndex !== 'undefined' ? novaMenuIndex : []).replace(/</g, '\\u003c') %>;<% } %>
   </script>
   <script src="/js/vendor/marked.min.js"></script>
   <script src="/js/vendor/dompurify.min.js"></script>
   <script src="/js/nova/render.js?v=20261017v5"></script>
   <script src="/js/nova/cards.js?v=20261017v5"></script>
   <script src="/js/nova/stream.js?v=20261017v5"></script>
-  <script src="/js/nova/palette.js?v=20261017v5"></script>
+  <script src="/js/nova/palette.js?v=20261111v3"></script>
   <script src="/js/nova/install.js?v=20261017v5"></script>
-  <script src="/js/nova/gestures.js?v=20261017v5"></script>
+  <script src="/js/nova/gestures.js?v=20261111v3"></script>
   <script src="/js/nova/push.js?v=20261017v5"></script>
-  <script src="/js/nova/app.js?v=20261017v5"></script>
+  <script src="/js/nova/app.js?v=20261111v3"></script>
+  <% if (typeof useUiV3 !== 'undefined' && useUiV3) { %><script src="/js/nova/nova-v3.js?v=20261111v3"></script><% } %>
 </body>
 </html>

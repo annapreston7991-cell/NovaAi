@@ -3,39 +3,49 @@
  * Licensed under the LLYVerse License 1.0. See LICENSE. Credit to LLYVerse is required.
  *
  * @llyverse/nova - Core Entrypoint
+ *
+ * Call configure() first (see lib/host.js), then use the exports. Everything except
+ * configure, runMigrations, viewsPath and publicPath loads lazily on first use, so
+ * the host can configure Nova before any Nova module touches the database.
  */
 
 const path = require('path');
-const createNovaRouter = require('./lib/nova');
-const novaChat = require('./lib/nova_chat');
-const novaComputer = require('./lib/nova_computer');
-const novaScreen = require('./lib/nova_screen');
-const novaMcp = require('./lib/nova_mcp');
-const novaPush = require('./lib/nova_push');
-const novaJobs = require('./lib/nova_jobs');
-const novaUsage = require('./lib/nova_usage');
-const novaWidgets = require('./lib/nova_widgets');
-const novaApprovals = require('./lib/nova_approvals');
-const novaRoutines = require('./lib/nova_routines');
-const novaSecrets = require('./lib/nova_secrets');
-const novaActions = require('./lib/nova_actions');
-const novaLockdown = require('./middleware/nova-lockdown');
+const host = require('./lib/host');
+const { runMigrations } = require('./lib/migrations');
 
-module.exports = {
-  createNovaRouter,
-  novaChat,
-  novaComputer,
-  novaScreen,
-  novaMcp,
-  novaPush,
-  novaJobs,
-  novaUsage,
-  novaWidgets,
-  novaApprovals,
-  novaRoutines,
-  novaSecrets,
-  novaActions,
-  novaLockdown,
+const api = {
+  configure: host.configure,
+  runMigrations,
   viewsPath: path.join(__dirname, 'views'),
-  publicPath: path.join(__dirname, 'public')
+  publicPath: path.join(__dirname, 'public'),
+  promptsPath: path.join(__dirname, 'prompts')
 };
+
+const lazy = {
+  createNovaRouter: './lib/nova',
+  createNovaPluginsRouter: './lib/nova_plugins_router',
+  novaChat: './lib/nova_chat',
+  novaComputer: './lib/nova_computer',
+  novaScreen: './lib/nova_screen',
+  novaMcp: './lib/nova_mcp',
+  novaPush: './lib/nova_push',
+  novaJobs: './lib/nova_jobs',
+  novaUsage: './lib/nova_usage',
+  novaWidgets: './lib/nova_widgets',
+  novaApprovals: './lib/nova_approvals',
+  novaRoutines: './lib/nova_routines',
+  novaSecrets: './lib/nova_secrets',
+  novaActions: './lib/nova_actions',
+  novaPersona: './lib/nova_persona',
+  novaMenu: './lib/nova_menu',
+  novaPlugins: './lib/nova_plugins',
+  novaLockdown: './middleware/nova-lockdown',
+  requireNovaUser: './middleware/requireNovaUser',
+  requireApprovalToken: './middleware/requireApprovalToken'
+};
+
+for (const [name, file] of Object.entries(lazy)) {
+  Object.defineProperty(api, name, { enumerable: true, get: () => require(file) });
+}
+
+module.exports = api;

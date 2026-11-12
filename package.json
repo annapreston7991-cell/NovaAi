@@ -1,16 +1,45 @@
 {
   "name": "@llyverse/nova",
-  "version": "1.0.0",
-  "description": "Nova AI - Conversational Agent, Computer Control, MCP, and Live Workstation",
+  "version": "1.1.0",
+  "description": "Nova AI for LLYVerse: chat, layout v3 (simpler menus), member plugins, routines, MCP tools and the live workstation, packaged for the LLYVerse site to load.",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "lib/",
+    "middleware/",
+    "views/",
+    "public/",
+    "schemas/",
+    "prompts/",
+    "docs/",
+    ".env.example",
+    "LICENSE",
+    "README.md",
+    "scripts/",
+    "test/"
+  ],
   "scripts": {
-    "test": "node test/check-names.js",
+    "test": "node test/check-names.js && node test/test-package.js && node scripts/test-nova-ui-v3.js && node scripts/test-nova-plugins.js",
     "check:names": "node test/check-names.js"
   },
   "author": "Lily <248515536+annapreston7991-cell@users.noreply.github.com>",
   "license": "SEE LICENSE IN LICENSE",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "express": "^4.21.2",
-    "ejs": "^3.1.10"
+    "ajv": "^8.17.1",
+    "express-rate-limit": "^8.0.0",
+    "multer": "^2.0.0",
+    "web-push": "^3.6.7"
+  },
+  "peerDependencies": {
+    "ejs": ">=3.1.10",
+    "express": ">=4.21.2"
+  },
+  "devDependencies": {
+    "better-sqlite3": "^12.0.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
   }
 }

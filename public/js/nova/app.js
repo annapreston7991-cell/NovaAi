@@ -206,7 +206,7 @@
     const agent = state.agents.find(a => a.id === state.activeAgentId) || {
       id: 'nova',
       name: 'Nova',
-      title: 'CEO & Executive Architect',
+      title: 'Guide, builder & companion',
       description: 'Autonomous executive companion, systems architect, and LLYVerse orchestrator.'
     };
 
@@ -1179,7 +1179,7 @@
       }
 
       if (window.initNovaPalette) {
-        window.initNovaPalette({ state, selectAgent, openConversation, toggleInfoPane });
+        window.__novaPalette = window.initNovaPalette({ state, selectAgent, openConversation, toggleInfoPane }) || null;
       }
     } catch (e) {
       console.error('[Nova Init Error]', e);
@@ -1726,6 +1726,8 @@
         await api('POST', '/api/nova/resume', {}, { 'X-Nova-Approval-Token': mint.token });
         state.novaPaused = false;
         updatePausedUI();
+      } else if (action === 'open-palette') {
+        if (window.__novaPalette) window.__novaPalette.open();
       } else if (action === 'toggle-info-pane') {
         toggleInfoPane();
       } else if (action === 'open-memory-modal' || action === 'open-memory-view') {
@@ -2003,94 +2005,7 @@
     });
 
 
-    // NOVA-UI-3 & NOVA-UI-4: Expandable Groups and Mobile Bottom Sheets
-    document.querySelectorAll(".nova-v3-group-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const group = btn.closest(".nova-v3-group");
-        if (!group) return;
-        const subitems = group.querySelector(".nova-v3-subitems");
-        const arrow = group.querySelector(".group-arrow");
-        const isExpanded = btn.getAttribute("aria-expanded") === "true";
-
-        btn.setAttribute("aria-expanded", String(!isExpanded));
-        if (subitems) {
-          subitems.classList.toggle("hidden", isExpanded);
-        }
-        if (arrow) {
-          arrow.classList.toggle("-rotate-90", isExpanded);
-        }
-        const groupId = group.getAttribute("data-group-id");
-        if (groupId) {
-          localStorage.setItem("nova_v3_group_" + groupId, isExpanded ? "collapsed" : "expanded");
-        }
-      });
-    });
-
-    // Restore saved group state from localStorage
-    document.querySelectorAll(".nova-v3-group").forEach((group) => {
-      const groupId = group.getAttribute("data-group-id");
-      if (!groupId) return;
-      const saved = localStorage.getItem("nova_v3_group_" + groupId);
-      const btn = group.querySelector(".nova-v3-group-btn");
-      const subitems = group.querySelector(".nova-v3-subitems");
-      const arrow = group.querySelector(".group-arrow");
-      if (saved === "collapsed") {
-        if (btn) btn.setAttribute("aria-expanded", "false");
-        if (subitems) subitems.classList.add("hidden");
-        if (arrow) arrow.classList.add("-rotate-90");
-      } else if (saved === "expanded") {
-        if (btn) btn.setAttribute("aria-expanded", "true");
-        if (subitems) subitems.classList.remove("hidden");
-        if (arrow) arrow.classList.remove("-rotate-90");
-      }
-    });
-
-    // Mobile Bottom Sheets logic (NOVA-UI-4)
-    const sheetBackdrop = document.getElementById("novaV3SheetBackdrop");
-    function closeAllV3Sheets() {
-      document.querySelectorAll(".nova-v3-bottom-sheet").forEach((sheet) => {
-        sheet.classList.add("translate-y-full");
-        setTimeout(() => sheet.classList.add("hidden"), 200);
-      });
-      if (sheetBackdrop) {
-        sheetBackdrop.classList.remove("opacity-100");
-        sheetBackdrop.classList.add("opacity-0");
-        setTimeout(() => sheetBackdrop.classList.add("hidden"), 200);
-      }
-    }
-
-    if (sheetBackdrop) {
-      sheetBackdrop.addEventListener("click", closeAllV3Sheets);
-    }
-
-    document.querySelectorAll(".close-sheet-btn").forEach((b) => {
-      b.addEventListener("click", closeAllV3Sheets);
-    });
-
-    document.querySelectorAll(".nova-v3-mobile-tab").forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const targetId = tab.getAttribute("data-sheet-target");
-        const targetSheet = document.getElementById(targetId);
-        if (!targetSheet) return;
-
-        const isVisible = !targetSheet.classList.contains("hidden") && !targetSheet.classList.contains("translate-y-full");
-        closeAllV3Sheets();
-        if (isVisible) return;
-
-        if (sheetBackdrop) {
-          sheetBackdrop.classList.remove("hidden");
-          requestAnimationFrame(() => {
-            sheetBackdrop.classList.remove("opacity-0");
-            sheetBackdrop.classList.add("opacity-100");
-          });
-        }
-        targetSheet.classList.remove("hidden");
-        requestAnimationFrame(() => {
-          targetSheet.classList.remove("translate-y-full");
-        });
-      });
-    });
-
+    // Layout v3 menus (groups, sheets) live in public/js/nova/nova-v3.js.
     if (window.lucide) window.lucide.createIcons();
   }
 

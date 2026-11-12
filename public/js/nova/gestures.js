@@ -72,7 +72,19 @@
 
   function toggleNovaPopupMenu() {
     const menu = document.getElementById('novaMobileTabs');
-    if (!menu) return;
+    if (!menu) {
+      // Layout v3 has no popup menu: the Nova icon opens the chat list drawer on phones
+      // and shows/hides the sidebar on desktop.
+      const sb = document.getElementById('novaSidebar');
+      if (!sb) return;
+      if (isMobilePhoneViewport()) {
+        if (sb.classList.contains('is-mobile-open')) closeMobileDrawers();
+        else { setMobileViewMode('list'); openMobileSidebar(); }
+      } else {
+        sb.classList.toggle('is-hidden');
+      }
+      return;
+    }
     const isHidden = menu.classList.contains('hidden') || menu.classList.contains('is-hidden');
     if (isHidden) {
       menu.classList.remove('hidden', 'is-hidden');

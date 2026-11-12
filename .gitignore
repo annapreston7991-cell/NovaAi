@@ -7,3 +7,12 @@ node_modules/
 dist/
 build/
 coverage/
+
+# keep the example env file
+!.env.example
+*.pem
+*.key
+*.sqlite
+*.sqlite3
+data/
+*.nova-backup

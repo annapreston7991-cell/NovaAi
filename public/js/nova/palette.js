@@ -43,7 +43,7 @@
       let html = `
         <div class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400">Quick Actions</div>
         <button type="button" data-palette-agent="nova" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 flex items-center justify-between text-xs text-slate-200">
-          <span>Switch to <strong>Nova</strong> (CEO &amp; Executive Architect)</span>
+          <span>Switch to <strong>Nova</strong> (guide, builder &amp; companion)</span>
           <span class="text-[10px] font-mono text-cyan-400">#06b6d4</span>
         </button>
         <button type="button" data-palette-agent="astra" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 flex items-center justify-between text-xs text-slate-200">
@@ -74,19 +74,47 @@
       resultsEl.innerHTML = html;
     }
 
+    // Layout v3 (NOVA-UI-13): menu features are searchable too. window.__NOVA_MENU__ is
+    // built on the server for this viewer, so a member never gets Admin items here.
+    function menuMatches(q) {
+      const menu = Array.isArray(window.__NOVA_MENU__) ? window.__NOVA_MENU__ : [];
+      const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+      if (!words.length) return [];
+      return menu.filter((item) => {
+        const hay = `${item.label} ${item.group}`.toLowerCase();
+        return words.every((w) => hay.includes(w));
+      }).slice(0, 8);
+    }
+
+    function menuHtml(items) {
+      if (!items.length) return '';
+      let html = `<div class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400">Menu</div>`;
+      for (const item of items) {
+        html += `
+          <button type="button" data-palette-menu="${escapeHtml(item.id)}" class="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 flex items-center justify-between text-xs text-white">
+            <span class="truncate">${escapeHtml(item.label)}</span>
+            <span class="text-[10px] font-mono text-cyan-300">${escapeHtml(item.group)}</span>
+          </button>
+        `;
+      }
+      return html;
+    }
+
     async function runSearch(q) {
       const trimmed = q.trim();
       if (!trimmed) {
         renderDefaultCommands();
         return;
       }
+      const menuPart = menuHtml(menuMatches(trimmed));
+      if (menuPart) resultsEl.innerHTML = menuPart;
       try {
         const res = await fetch(`/api/nova/search?q=${encodeURIComponent(trimmed)}`, { credentials: 'same-origin' });
         const data = await res.json();
         const convs = data.conversations || [];
         const msgs = data.messages || [];
 
-        let html = '';
+        let html = menuPart;
         if (convs.length > 0) {
           html += `<div class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400">Matching Chats</div>`;
           for (const c of convs) {
@@ -112,7 +140,7 @@
         if (!html) {
           html = `<div class="p-4 text-center text-xs text-slate-400">No chats or messages found for "${escapeHtml(trimmed)}".</div>`;
         }
-        resultsEl.innerHTML = html;
+        if (input.value.trim() === trimmed) resultsEl.innerHTML = html;
       } catch (e) {}
     }
 
@@ -122,6 +150,15 @@
     });
 
     resultsEl.addEventListener('click', (e) => {
+      const menuBtn = e.target.closest('[data-palette-menu]');
+      if (menuBtn) {
+        const id = menuBtn.getAttribute('data-palette-menu');
+        close();
+        // Reuse the real menu item so it behaves exactly like clicking it in the menu.
+        const target = document.querySelector(`.nova-v3-sidebar [data-menu-id="${CSS.escape(id)}"], .nova-v3-sheet [data-menu-id="${CSS.escape(id)}"]`);
+        if (target) target.click();
+        return;
+      }
       const agentBtn = e.target.closest('[data-palette-agent]');
       if (agentBtn) {
         app.selectAgent(agentBtn.getAttribute('data-palette-agent'));
