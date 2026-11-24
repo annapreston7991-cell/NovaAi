@@ -75,6 +75,66 @@
     border-bottom-right-radius: 4px;
     word-break: break-word;
   }
+
+  .nova-widget-thinking {
+    max-width: 88%;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+  .nova-widget-thinking-summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #67e8f9;
+    font-size: 12px;
+    font-weight: 600;
+    user-select: none;
+    min-height: 28px;
+  }
+  .nova-widget-thinking-summary::-webkit-details-marker { display: none; }
+  .nova-widget-thinking-summary::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid #22d3ee;
+    border-bottom: 1.5px solid #22d3ee;
+    transform: rotate(-45deg);
+    margin-top: -2px;
+  }
+  .nova-widget-thinking[open] .nova-widget-thinking-summary::before {
+    transform: rotate(45deg);
+    margin-top: 1px;
+  }
+  .nova-thinking-pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: #22d3ee;
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.7);
+    animation: nova-thinking-pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes nova-thinking-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+  .nova-widget-thinking-body {
+    margin-top: 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: rgba(6, 182, 212, 0.06);
+    border: 1px solid rgba(6, 182, 212, 0.16);
+    color: #94a3b8;
+    font-size: 12.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 160px;
+    overflow-y: auto;
+  }
   .nova-widget-bubble-assistant {
     max-width: 88%;
     background: #0f172a;
@@ -311,11 +371,13 @@
           });
           if (mRes.ok) {
             const mData = await mRes.json();
-            const msgs = (mData.messages || []).filter((m) => m.kind === 'text' || m.kind === 'result');
+            const msgs = (mData.messages || []).filter((m) => (m.kind === 'text' || m.kind === 'result') && !(m.payload && m.payload.isAck));
             if (msgs.length > 0) {
               window._novaWidgetMessages = msgs.map((m) => ({
                 role: m.role,
-                content: m.body || ''
+                content: m.body || '',
+                thinking: (m.payload && m.payload.thinking) || '',
+                thinkingMs: m.payload && m.payload.thinkingMs
               }));
               renderNovaWidgetChat();
             }
@@ -415,7 +477,7 @@
     if (!container) return;
     container.innerHTML = '';
     window._novaWidgetMessages.forEach((msg) => {
-      appendNovaWidgetBubble(msg.role, msg.content, false);
+      appendNovaWidgetBubble(msg.role, msg.content, false, msg);
     });
     scrollNovaWidgetBottom();
   }
@@ -440,7 +502,7 @@
     return html;
   }
 
-  function appendNovaWidgetBubble(role, text, isLive) {
+  function appendNovaWidgetBubble(role, text, isLive, extras) {
     const container = document.getElementById('novaWidgetMessages');
     if (!container) return null;
 
@@ -473,12 +535,37 @@
     avatar.style.marginTop = '2px';
     avatar.innerHTML = '<img src="/images/nova-icon.jpg?v=20260925" alt="Nova" style="width:100%;height:100%;object-fit:cover;border-radius:9999px;">';
 
+    const column = document.createElement('div');
+    column.style.display = 'flex';
+    column.style.flexDirection = 'column';
+    column.style.gap = '6px';
+    column.style.maxWidth = '88%';
+    column.style.minWidth = '0';
+
+    const thinkingEl = document.createElement('details');
+    thinkingEl.className = 'nova-widget-thinking';
+    const savedThinking = extras && extras.thinking ? String(extras.thinking) : '';
+    const savedMs = extras && extras.thinkingMs;
+    thinkingEl.hidden = !savedThinking;
+    const savedLabel = (savedMs == null || savedMs === '') ? 'Thought process' : ('Thought for ' + Math.max(1, Math.round(Number(savedMs) / 1000)) + 's');
+    thinkingEl.innerHTML = savedThinking
+      ? ('<summary class="nova-widget-thinking-summary"><span class="nova-thinking-label">' + savedLabel + '</span></summary><div class="nova-widget-thinking-body"></div>')
+      : '<summary class="nova-widget-thinking-summary"><span class="nova-thinking-pulse" aria-hidden="true"></span><span class="nova-thinking-label">Thinking…</span></summary><div class="nova-widget-thinking-body"></div>';
+    const thinkingBody = thinkingEl.querySelector('.nova-widget-thinking-body');
+    if (savedThinking && thinkingBody) thinkingBody.textContent = savedThinking;
+
     const bubble = document.createElement('div');
     bubble.className = 'nova-widget-bubble-assistant' + (isLive ? ' nova-live-stream' : '');
     bubble.innerHTML = renderSimpleMarkdown(text);
+    if (!text) bubble.style.display = 'none';
+    bubble._thinkingEl = thinkingEl;
+    bubble._thinkingBody = thinkingBody;
+    bubble._thinkingLabel = thinkingEl.querySelector('.nova-thinking-label');
 
+    column.appendChild(thinkingEl);
+    column.appendChild(bubble);
     wrapperDiv.appendChild(avatar);
-    wrapperDiv.appendChild(bubble);
+    wrapperDiv.appendChild(column);
     container.appendChild(wrapperDiv);
     scrollNovaWidgetBottom();
     return bubble;
@@ -518,7 +605,11 @@
 
     window._novaWidgetStreaming = true;
     if (sendBtn) sendBtn.disabled = true;
-    const bubbleContent = appendNovaWidgetBubble('assistant', '...', true);
+    const bubbleContent = appendNovaWidgetBubble('assistant', '', true);
+    if (bubbleContent && bubbleContent._thinkingEl) {
+      bubbleContent._thinkingEl.hidden = false;
+      bubbleContent._thinkingEl.open = true;
+    }
 
     try {
       const response = await fetch('/api/chat', {
@@ -528,7 +619,7 @@
           model: 'novaAI:latest',
           persona: 'nova',
           tools: false,
-          messages: window._novaWidgetMessages.slice(-10)
+          messages: window._novaWidgetMessages.slice(-10).map((m) => ({ role: m.role, content: m.content }))
         })
       });
 
@@ -546,6 +637,9 @@
       const reader = response.body.getReader();
       const decoder = new TextDecoder('utf-8');
       let streamedText = '';
+      let streamedThinking = '';
+      let thinkingStartedAt = 0;
+      let answerStarted = false;
       let buffer = '';
 
       while (true) {
@@ -562,10 +656,35 @@
           if (dataStr === '[DONE]') continue;
           try {
             const parsed = JSON.parse(dataStr);
+            const thinkTok = parsed.thinking || '';
             const token = (parsed.message && parsed.message.content) || parsed.response || '';
+            if (thinkTok) {
+              if (!thinkingStartedAt) thinkingStartedAt = Date.now();
+              streamedThinking += thinkTok;
+              if (bubbleContent && bubbleContent._thinkingEl) {
+                bubbleContent._thinkingEl.hidden = false;
+                if (!answerStarted) bubbleContent._thinkingEl.open = true;
+                if (bubbleContent._thinkingBody) bubbleContent._thinkingBody.textContent = streamedThinking;
+              }
+            }
             if (token) {
+              if (!answerStarted) {
+                answerStarted = true;
+                if (bubbleContent && bubbleContent._thinkingEl) {
+                  if (streamedThinking) {
+                    bubbleContent._thinkingEl.open = false;
+                    const sec = Math.max(1, Math.round((Date.now() - (thinkingStartedAt || Date.now())) / 1000));
+                    if (bubbleContent._thinkingLabel) bubbleContent._thinkingLabel.textContent = 'Thought for ' + sec + 's';
+                    const pulse = bubbleContent._thinkingEl.querySelector('.nova-thinking-pulse');
+                    if (pulse) pulse.remove();
+                  } else {
+                    bubbleContent._thinkingEl.hidden = true;
+                  }
+                }
+              }
               streamedText += token;
               if (bubbleContent) {
+                bubbleContent.style.display = '';
                 bubbleContent.innerHTML = renderSimpleMarkdown(streamedText);
                 scrollNovaWidgetBottom();
               }
@@ -579,7 +698,12 @@
         if (bubbleContent) bubbleContent.innerHTML = renderSimpleMarkdown(streamedText);
       }
 
-      window._novaWidgetMessages.push({ role: 'assistant', content: streamedText });
+      const saved = { role: 'assistant', content: streamedText };
+      if (streamedThinking) {
+        saved.thinking = streamedThinking;
+        saved.thinkingMs = Math.max(0, Date.now() - (thinkingStartedAt || Date.now()));
+      }
+      window._novaWidgetMessages.push(saved);
       saveGuestSessionHistory();
       checkGuestPrompt();
     } catch (err) {
