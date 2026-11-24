@@ -1,6 +1,6 @@
 {
   "name": "@llyverse/nova",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Nova AI for LLYVerse: chat, layout v3 (simpler menus), member plugins, routines, MCP tools and the live workstation, packaged for the LLYVerse site to load.",
   "main": "index.js",
   "files": [
@@ -19,7 +19,7 @@
     "test/"
   ],
   "scripts": {
-    "test": "node test/check-names.js && node test/test-package.js && node scripts/test-nova-ui-v3.js && node scripts/test-nova-plugins.js",
+    "test": "node test/check-names.js && node test/test-package.js && node scripts/test-nova-ui-v3.js && node scripts/test-nova-plugins.js && node scripts/test-nova-thinking.js",
     "check:names": "node test/check-names.js"
   },
   "author": "Lily <248515536+annapreston7991-cell@users.noreply.github.com>",

@@ -437,6 +437,72 @@
     return details;
   }
 
+  function thoughtLabel(ms, live) {
+    if (live) return 'Thinking…';
+    if (ms == null || ms === '') return 'Thought process';
+    const sec = Math.max(1, Math.round(Number(ms) / 1000));
+    return `Thought for ${sec}s`;
+  }
+
+  function isAckMessage(msg) {
+    return !!(msg && msg.payload && msg.payload.isAck);
+  }
+
+  function renderThinkingElement(msg) {
+    const thinking = msg.payload && typeof msg.payload.thinking === 'string' ? msg.payload.thinking : '';
+    const steps = msg.payload && Array.isArray(msg.payload.steps) ? msg.payload.steps : [];
+    const isLive = msg.status === 'streaming' && !(msg.body || '');
+    const hasThinking = thinking.trim().length > 0 || steps.length > 0 || isLive;
+    if (!hasThinking) return null;
+
+    const details = document.createElement('details');
+    details.className = 'nova-thinking';
+    details.setAttribute('data-thinking-for', msg.id);
+    if (isLive) details.open = true;
+
+    const thinkingMs = msg.payload && msg.payload.thinkingMs;
+    const summary = document.createElement('summary');
+    summary.className = 'nova-thinking-summary';
+    if (isLive) {
+      summary.innerHTML = '<span class="nova-thinking-pulse" aria-hidden="true"></span><span class="nova-thinking-label">Thinking…</span>';
+    } else {
+      summary.innerHTML = `<span class="nova-thinking-label">${escapeHtml(thoughtLabel(thinkingMs))}</span>`;
+    }
+    details.appendChild(summary);
+
+    const body = document.createElement('div');
+    body.className = 'nova-thinking-body';
+    body.textContent = thinking;
+    details.appendChild(body);
+
+    if (steps.length) {
+      const list = document.createElement('ul');
+      list.className = 'nova-thinking-steps';
+      steps.forEach((step) => {
+        const li = document.createElement('li');
+        li.appendChild(document.createTextNode(step.body || step.tool || 'Step'));
+        if (step.tool) {
+          const tool = document.createElement('span');
+          tool.className = 'nova-thinking-step-tool';
+          tool.textContent = step.tool;
+          li.appendChild(tool);
+        }
+        list.appendChild(li);
+      });
+      details.appendChild(list);
+    }
+    return details;
+  }
+
+  function collapseThinkingDetails(details, ms) {
+    if (!details) return;
+    details.open = false;
+    const label = details.querySelector('.nova-thinking-label');
+    if (label) label.textContent = thoughtLabel(ms);
+    const pulse = details.querySelector('.nova-thinking-pulse');
+    if (pulse) pulse.remove();
+  }
+
   function updateConnectorBadges(connectors) {
     if (!connectors || typeof connectors !== 'object') return;
     state.connectors = connectors;
@@ -512,9 +578,16 @@
       bubble.appendChild(header);
     }
 
+    if (!isUser) {
+      const thinkingEl = renderThinkingElement(msg);
+      if (thinkingEl) bubble.appendChild(thinkingEl);
+    }
+
     const bodyDiv = document.createElement('div');
     bodyDiv.className = 'nova-msg-body';
-    bodyDiv.innerHTML = renderRichMarkdown(msg.body || (msg.status === 'streaming' ? '…' : ''));
+    const waitingOnThinking = !isUser && msg.status === 'streaming' && !(msg.body || '');
+    bodyDiv.innerHTML = renderRichMarkdown(msg.body || (waitingOnThinking ? '' : (msg.status === 'streaming' ? '…' : '')));
+    if (waitingOnThinking) bodyDiv.hidden = true;
     bubble.appendChild(bodyDiv);
 
     // Attachments & Voice Memos (§4.4)
@@ -590,7 +663,12 @@
     let prevRendered = null;
     while (i < state.messages.length) {
       const msg = state.messages[i];
+      if (isAckMessage(msg)) {
+        i++;
+        continue;
+      }
       // Group consecutive progress messages into one collapsible "Steps (N)" block (§4.7)
+      // Historical steps stay grouped here; new turns fold real tool steps into the thinking block.
       if (msg.kind === 'progress') {
         const group = [msg];
         while (i + 1 < state.messages.length && state.messages[i + 1].kind === 'progress') {
@@ -1057,6 +1135,7 @@
           return;
         }
         if (conversationId === state.activeConversationId) {
+          if (isAckMessage(message)) return;
           if (!state.messages.some(m => m.id === message.id)) {
             state.messages.push(message);
             renderMessagesList();
@@ -1070,18 +1149,63 @@
           }
         }
       },
-      'message.delta': ({ conversationId, messageId, delta }) => {
+      'message.delta': ({ conversationId, messageId, delta, thinkingDelta, phase }) => {
         if (conversationId !== state.activeConversationId) return;
         const msg = state.messages.find(m => m.id === messageId);
-        if (msg) {
-          msg.body = (msg.body || '') + delta;
-          const el = document.querySelector(`#nova-msg-${messageId} .nova-msg-body`);
-          if (el) {
-            el.innerHTML = renderRichMarkdown(msg.body);
-            const streamEl = document.getElementById('novaMessagesStream');
-            if (streamEl) streamEl.scrollTop = streamEl.scrollHeight;
+        if (!msg) return;
+        if (!msg.payload || typeof msg.payload !== 'object') msg.payload = {};
+        if (thinkingDelta) {
+          msg.payload.thinking = (msg.payload.thinking || '') + thinkingDelta;
+          if (!msg.payload.thinkingStartedAt) msg.payload.thinkingStartedAt = Date.now();
+        }
+        const answerChunk = delta || '';
+        const answerStarted = Boolean(answerChunk);
+        if (answerStarted) {
+          if (!(msg.body || '') && msg.payload.thinking && !msg.payload.thinkingMs) {
+            msg.payload.thinkingMs = Date.now() - (msg.payload.thinkingStartedAt || Date.now());
+          }
+          msg.body = (msg.body || '') + answerChunk;
+        }
+
+        let root = document.getElementById(`nova-msg-${messageId}`);
+        if (!root) {
+          renderMessagesList();
+          root = document.getElementById(`nova-msg-${messageId}`);
+        }
+        if (!root) return;
+
+        if (thinkingDelta || (msg.payload.thinking && !root.querySelector('[data-thinking-for]'))) {
+          let details = root.querySelector('[data-thinking-for]');
+          if (!details) {
+            details = renderThinkingElement(Object.assign({}, msg, { status: answerStarted ? 'sent' : 'streaming', body: msg.body || '' }));
+            if (details) {
+              const bubble = root.querySelector('.nova-bubble');
+              const bodyEl = root.querySelector('.nova-msg-body');
+              if (bubble && bodyEl) bubble.insertBefore(details, bodyEl);
+              else if (bubble) bubble.appendChild(details);
+              if (!answerStarted) details.open = true;
+            }
+          } else {
+            const thinkBody = details.querySelector('.nova-thinking-body');
+            if (thinkBody) thinkBody.textContent = msg.payload.thinking || '';
           }
         }
+
+        if (answerStarted) {
+          const details = root.querySelector('[data-thinking-for]');
+          if (details && msg.payload.thinking) {
+            collapseThinkingDetails(details, msg.payload.thinkingMs);
+          } else if (details && !(msg.payload.thinking || '').trim()) {
+            details.hidden = true;
+          }
+          const el = root.querySelector('.nova-msg-body');
+          if (el) {
+            el.hidden = false;
+            el.innerHTML = renderRichMarkdown(msg.body);
+          }
+        }
+        const streamEl = document.getElementById('novaMessagesStream');
+        if (streamEl) streamEl.scrollTop = streamEl.scrollHeight;
       },
       'message.updated': ({ conversationId, messageId, body, status, kind, payload }) => {
         if (conversationId !== state.activeConversationId) return;
